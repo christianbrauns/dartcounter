@@ -1,0 +1,12 @@
+<div mat-dialog-content>
+  <mat-form-field>
+    <input [(ngModel)]="data.name" matInput placeholder="Name">
+  </mat-form-field>
+  <mat-form-field>
+    <input [(ngModel)]="data.team" matInput placeholder="Team">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button (click)="onNoClick()" mat-button>Abbrechen</button>
+  <button [mat-dialog-close]="data" cdkFocusInitial mat-button>Ok</button>
+</div>

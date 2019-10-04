@@ -1,0 +1,69 @@
+<form [formGroup]="gameForm">
+  <div class="row">
+    <div class="col">
+      <h4>Spielvariante</h4>
+      <mat-form-field>
+        <mat-select formControlName="variant">
+          <mat-option value="x01">X01</mat-option>
+          <mat-option value="shanghai">Shanghai</mat-option>
+          <mat-option value="cricket">Cricket</mat-option>
+          <mat-option value="round-the-clock">Round the Clock</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="col">
+      <h4>Typ</h4>
+      <mat-form-field>
+        <mat-select formControlName="type">
+          <mat-option value="301">301</mat-option>
+          <mat-option value="401">401</mat-option>
+          <mat-option value="501">501</mat-option>
+          <mat-option value="601">601</mat-option>
+          <mat-option value="701">701</mat-option>
+          <mat-option value="801">801</mat-option>
+          <mat-option value="901">901</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="col">
+      <h4>Modi</h4>
+      <mat-form-field>
+        <mat-select formControlName="mode">
+          <mat-option value="s-out">Single Out</mat-option>
+          <mat-option value="d-in">Double In</mat-option>
+          <mat-option value="d-out">Double Out</mat-option>
+          <mat-option value="m-out">Master Out</mat-option>
+          <mat-option value="d-in-d-out">Db. In + Db. Out</mat-option>
+          <mat-option value="d-in-m-out">Db. In + Master Out</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </div>
+  <div class="row">
+    <div class="col">
+      <button (click)="lessPlayers()" mat-mini-fab>
+        <mat-icon>remove</mat-icon>
+      </button>
+      <mat-form-field>
+        <input matInput value="{{countPlayer}}">
+      </mat-form-field>
+      <button (click)="moreplayers()" mat-mini-fab>
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div *ngFor="let i of [].constructor(countPlayer)" class="col">
+      <mat-label>Spieler</mat-label>
+      <mat-form-field>
+        <mat-select (selectionChange)="addPlayer($event.value)">
+          <mat-option *ngFor="let player of players | async" [value]="player.name">{{player.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="row">
+    <button (click)="startGame()" color="primary" mat-raised-button type="submit">Spiel Starten</button>
+  </div>
+</form>
