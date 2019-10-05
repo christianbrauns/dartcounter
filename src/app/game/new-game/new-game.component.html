@@ -46,21 +46,23 @@
         <mat-icon>remove</mat-icon>
       </button>
       <mat-form-field>
-        <input matInput value="{{countPlayer}}">
+        <input matInput value="{{playersForm.controls.length}}">
       </mat-form-field>
       <button (click)="moreplayers()" mat-mini-fab>
         <mat-icon>add</mat-icon>
       </button>
     </div>
   </div>
-  <div class="row">
-    <div *ngFor="let i of [].constructor(countPlayer)" class="col">
+  <div class="row" formArrayName="players">
+    <div *ngFor="let pl of playersForm.controls; let i = index" class="col">
       <mat-label>Spieler</mat-label>
-      <mat-form-field>
-        <mat-select (selectionChange)="addPlayer($event.value)">
-          <mat-option *ngFor="let player of players | async" [value]="player.name">{{player.name}}</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <ng-container [formGroup]="pl">
+        <mat-form-field>
+          <mat-select (selectionChange)="addPlayer($event.value)" formControlName="name">
+            <mat-option *ngFor="let player of playersData | async" [value]="player.name">{{player.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </ng-container>
     </div>
   </div>
   <div class="row">

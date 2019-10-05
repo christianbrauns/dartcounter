@@ -12,7 +12,7 @@ export class GameComponent implements OnInit {
   private game: Observable<any>;
 
   constructor(private readonly db: AngularFirestore, route: ActivatedRoute) {
-    this.game = db.collection('games').doc(route.snapshot.paramMap.get('id')).valueChanges();
+    this.game = db.collection('games').doc(route.snapshot.paramMap.get('id')).valueChanges();//.pipe(source => console.log(source));
   }
 
   public ngOnInit() {
