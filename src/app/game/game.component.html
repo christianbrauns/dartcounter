@@ -1,2 +1,61 @@
-<p>game works!</p>
 <p>{{game | async | json}}</p>
+<div class="row">
+  <div class="col">
+    <div class="row">
+      <div class="col">
+        {{currentPlayer?.name}}
+      </div>
+      <div class="col">
+        {{currentPlayerRound[0] !== undefined ? currentPlayerRound[0] : '-'}}
+      </div>
+      <div class="col">
+        {{currentPlayerRound[1] !== undefined ? currentPlayerRound[1] : '-'}}
+      </div>
+      <div class="col">
+        {{currentPlayerRound[2] !== undefined ? currentPlayerRound[2] : '-'}}
+      </div>
+    </div>
+    <div class="col">
+      {{currentPlayerCount}}
+    </div>
+  </div>
+</div>
+<div class="row mb-3">
+  <div class="col">
+    {{currentPlayerAverage}}
+  </div>
+  <div class="col">
+    <!--    <button mat-raised-button>Triple</button>-->
+  </div>
+</div>
+<div class="row mb-3">
+  <div class="col text-center">
+    <button (click)="double()" color="{{countDouble?'primary':''}}" mat-raised-button>Double</button>
+  </div>
+  <div class="col text-center">
+    <button (click)="triple()" color="{{countTriple?'primary':''}}" mat-raised-button>Triple</button>
+  </div>
+</div>
+<div *ngFor="let i of [].constructor(7) , let x = index" class="row mb-3">
+  <div class="col text-center">
+    <button (click)="hit(x * 3 + 1)" mat-mini-fab>{{x * 3 + 1}}</button>
+  </div>
+  <div class="col text-center">
+    <button (click)="hit(x * 3 + 2)" mat-mini-fab>{{x * 3 + 2}}</button>
+  </div>
+  <div class="col text-center">
+    <button (click)="hit(x * 3 + 3)" *ngIf="x<6; else bull" mat-mini-fab>{{x * 3 + 3}}</button>
+    <ng-template #bull>
+      <button (click)="hit(25)" [disabled]="countTriple" mat-mini-fab>Bull</button>
+    </ng-template>
+  </div>
+</div>
+<div class="row mb-3">
+  <div class="col text-center">
+    <button (click)="hit(0)" color="{{countDouble?'primary':''}}" mat-raised-button>Daneben</button>
+  </div>
+  <div class="col text-center">
+    <button (click)="undo()" mat-raised-button>Undo</button>
+  </div>
+</div>
+

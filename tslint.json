@@ -60,10 +60,6 @@
       "trace"
     ],
     "no-empty": false,
-    "no-inferrable-types": [
-      true,
-      "ignore-params"
-    ],
     "no-non-null-assertion": true,
     "no-redundant-jsdoc": true,
     "no-switch-case-fall-through": true,
@@ -107,7 +103,5 @@
     "array-destructuring"
   ],
   "no-any": true,
-  "no-input-rename": true,
-  "no-output-rename": true,
   "prefer-const": true
 }

@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {MatDialog} from '@angular/material';
-import {NewPlayerDialogComponent} from './new-player-dialog/new-player-dialog.component';
 import {AngularFirestore} from '@angular/fire/firestore';
+import {MatDialog} from '@angular/material';
 import {Observable} from 'rxjs';
+import {NewPlayerDialogComponent} from './new-player-dialog/new-player-dialog.component';
 
 export interface PlayerData {
   team: string;
