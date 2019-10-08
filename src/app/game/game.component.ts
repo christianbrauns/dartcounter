@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { PlayerData } from '../player/player.component';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/firestore';
+import {MatProgressBar, MatSnackBar} from '@angular/material';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Observable} from 'rxjs';
+import {tap} from 'rxjs/operators';
+import {PlayerData} from '../player/player.component';
 
 export interface GameData {
   id: string;
@@ -23,31 +24,47 @@ export interface PlayerGameData extends PlayerData {
   styleUrls: ['./game.component.scss'],
 })
 export class GameComponent implements OnInit {
+  @ViewChild(MatProgressBar, {static: false}) public matProgressBar: MatProgressBar;
+  public progressValue: number = 0;
   public countDouble: boolean = false;
   public countTriple: boolean = false;
   public currentPlayer: PlayerGameData;
-  public currentPlayerAverage: number;
-  public currentPlayerCount: number = 301;
+  public gameCount: number = 301;
   public currentRound: number;
   public currentThrow: number;
   public readonly game: Observable<GameData>;
   public readonly players: Observable<Array<PlayerGameData>>;
+  public currentPlayerCount: number;
   private readonly firebaseGame: AngularFirestoreDocument<GameData>;
 
-  constructor(private readonly db: AngularFirestore, route: ActivatedRoute) {
+  constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private snackBar: MatSnackBar,
+              private readonly router: Router) {
     this.firebaseGame = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id'));
-    this.game = this.firebaseGame.valueChanges();
-    this.players = this.firebaseGame.collection<PlayerGameData>('players').valueChanges({ idField: 'id' }).pipe(
+    this.firebaseGame.valueChanges().pipe(
+      tap(x => this.gameCount = this.getGameCount(x.type))
+    ).subscribe();
+
+    this.players = this.firebaseGame.collection<PlayerGameData>('players').valueChanges({idField: 'id'}).pipe(
       tap(x => console.log(x)),
       tap((source: Array<PlayerGameData>) => {
         this.currentPlayer = this.findNextPlayer(source);
         this.currentThrow = this.currentPlayer.throws.length;
-        setTimeout(() => {
+        this.currentPlayerCount = this.currentPlayer.throws.reduce(this.reducer);
+
+        if (!this.currentRound) {
           this.currentRound = Math.floor(this.currentPlayer.throws.length / 3);
-        }, 3000);
+        } else if (this.currentRound !== Math.floor(this.currentPlayer.throws.length / 3)) {
+          this.progressValue = 1;
+          setTimeout(() => {
+            this.currentRound = Math.floor(this.currentPlayer.throws.length / 3);
+            this.progressValue = 0;
+          }, 3000);
+        }
       }),
     );
   }
+
+  public reducer = (accumulator, currentValue) => accumulator + currentValue;
 
   public double() {
     this.countDouble = !this.countDouble;
@@ -56,15 +73,30 @@ export class GameComponent implements OnInit {
 
   public hit(value: number) {
     const count: number = this.countTriple ? value * 3 : this.countDouble ? value * 2 : value;
-    this.currentPlayer.throws.push(count);
+
+    if (this.currentPlayerCount + count > this.gameCount) {
+      this.snackBar.open('Punktzahl Überschritten', '', {
+        duration: 3000,
+      });
+
+      this.currentPlayer.throws.push(null);
+
+      while (this.currentPlayer.throws.length % 3 !== 0) {
+        this.currentPlayer.throws.push(null);
+      }
+    } else {
+      this.currentPlayer.throws.push(count);
+    }
+
     this.firebaseGame.collection('players').doc(this.currentPlayer.id).update(this.currentPlayer)
       .catch(reason => console.log(reason))
       .then(value1 => console.log(value1));
 
     this.countDouble = false;
     this.countTriple = false;
-    if (this.currentPlayer.throws.length % 3 === 2) {
-      this.nextPlayer();
+
+    if (this.currentPlayerCount + count === this.gameCount) {
+      this.router.navigate(['result'], {relativeTo: this.route});
     }
   }
 
@@ -81,6 +113,10 @@ export class GameComponent implements OnInit {
     this.firebaseGame.collection('players').doc(this.currentPlayer.id).update(this.currentPlayer)
       .catch(reason => console.log(reason))
       .then(value1 => console.log(value1));
+  }
+
+  public getTrows(player: PlayerGameData): number {
+    return player.throws.filter(x => x !== null).length;
   }
 
   private findNextPlayer(source: Array<PlayerGameData>): PlayerGameData {
@@ -104,27 +140,26 @@ export class GameComponent implements OnInit {
         num = player.throws.length;
       }
     }
-    // players.forEach(value => {
-    //   if (num && num > value.throws.length) {
-    //     console.log('found next: ' + value.name);
-    //     return value;
-    //   } else {
-    //     num = value.throws.length;
-    //   }
-    // });
-
-    console.log('end');
 
     return players[0];
-    // const len: Array<number> = players.map(value => value.throws.length);
-    // const smalest: number = Math.min(...len);
-    //
-    // players.find(value => value.throws.length);
-    // players.return;
-    // players[0];
   }
 
-  private nextPlayer() {
-
+  private getGameCount(type: string): number {
+    switch (type) {
+      case '301':
+        return 301;
+      case '401':
+        return 401;
+      case '501':
+        return 501;
+      case '601':
+        return 601;
+      case '701':
+        return 701;
+      case '801':
+        return 801;
+      case '901':
+        return 901;
+    }
   }
 }

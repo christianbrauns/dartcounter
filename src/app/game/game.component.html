@@ -1,31 +1,40 @@
-<p>{{game | async | json}}</p>
-<p>{{players | async | json}}</p>
-<p>{{currentPlayer | json}}</p>
-<p>{{currentRound | json}}</p>
-<div class="row">
-  <div class="col">
+<mat-progress-bar #progressBar *ngIf="progressValue!==0" [value]="progressValue"
+                  mode="indeterminate"></mat-progress-bar>
+<div class="row ">
+  <div class="col border">
+
     <div class="row">
-      <div class="col">
+      <div class="col font-weight-bold">
         {{currentPlayer?.name}}
       </div>
-      <div class="col" *ngIf="currentRound !== undefined">
+      <div *ngIf="currentRound !== undefined" class="col">
         {{currentPlayer?.throws[currentRound * 3] !== undefined ? currentPlayer?.throws[currentRound * 3] : '-'}}
       </div>
-      <div class="col" *ngIf="currentRound !== undefined">
+      <div *ngIf="currentRound !== undefined" class="col">
         {{currentPlayer?.throws[currentRound * 3 + 1] !== undefined ? currentPlayer?.throws[currentRound * 3 + 1] : '-'}}
       </div>
-      <div class="col" *ngIf="currentRound !== undefined">
+      <div *ngIf="currentRound !== undefined" class="col">
         {{currentPlayer?.throws[currentRound * 3 + 2] !== undefined ? currentPlayer?.throws[currentRound * 3 + 2] : '-'}}
       </div>
     </div>
-    <div class="col">
-      {{currentPlayerCount}}
+
+    <div class="row">
+      <div *ngIf="currentPlayer" class="col font-weight-bold text-success">
+        {{gameCount - currentPlayerCount}}<br>
+        {{currentPlayerCount / getTrows(currentPlayer) | number}}
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div *ngFor="let player of players | async" class="row border">
+      {{player.name}}<br>
+      {{gameCount - player.throws.reduce(reducer)}}
+      {{player.throws.reduce(reducer) / getTrows(player) | number}}
     </div>
   </div>
 </div>
 <div class="row mb-3">
   <div class="col">
-    {{currentPlayerAverage}}
   </div>
   <div class="col">
     <!--    <button mat-raised-button>Triple</button>-->
@@ -41,21 +50,22 @@
 </div>
 <div *ngFor="let i of [].constructor(7) , let x = index" class="row mb-3">
   <div class="col text-center">
-    <button (click)="hit(x * 3 + 1)" mat-mini-fab>{{x * 3 + 1}}</button>
+    <button (click)="hit(x * 3 + 1)" color="primary" mat-raised-button>{{x * 3 + 1}}</button>
   </div>
   <div class="col text-center">
-    <button (click)="hit(x * 3 + 2)" mat-mini-fab>{{x * 3 + 2}}</button>
+    <button (click)="hit(x * 3 + 2)" color="primary" mat-raised-button>{{x * 3 + 2}}</button>
   </div>
   <div class="col text-center">
-    <button (click)="hit(x * 3 + 3)" *ngIf="x<6; else bull" mat-mini-fab>{{x * 3 + 3}}</button>
+    <button (click)="hit(x * 3 + 3)" *ngIf="x<6; else bull" color="primary" mat-raised-button>{{x * 3 + 3}}</button>
     <ng-template #bull>
-      <button (click)="hit(25)" [disabled]="countTriple" mat-mini-fab>Bull</button>
+      <button (click)="hit(25)" [disabled]="countTriple" color="primary"
+              mat-raised-button>{{countDouble ? 'Bull’s Eye' : 'Bull'}}</button>
     </ng-template>
   </div>
 </div>
 <div class="row mb-3">
   <div class="col text-center">
-    <button (click)="hit(0)" color="{{countDouble?'primary':''}}" mat-raised-button>Daneben</button>
+    <button (click)="hit(0)" mat-raised-button>Daneben</button>
   </div>
   <div class="col text-center">
     <button (click)="undo()" mat-raised-button>Undo</button>
