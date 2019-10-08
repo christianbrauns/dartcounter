@@ -25,7 +25,7 @@ export interface PlayerGameData extends PlayerData {
 export class GameComponent implements OnInit {
   public currentPlayer: PlayerGameData;
   public currentPlayerCount: number = 301;
-  public currentPlayerRound: Array<number> = [];
+  // public currentPlayerRound: Array<number> = [];
   public currentPlayerAverage: number;
   public countDouble: boolean = false;
   public countTriple: boolean = false;
@@ -61,14 +61,13 @@ export class GameComponent implements OnInit {
     const count: number = this.countTriple ? value * 3 : this.countDouble ? value * 2 : value;
     this.currentPlayer.round.push(count);
     this.firebaseGame.collection('players').doc('0').update(this.currentPlayer)
-    // this.firebaseGame.collection('players').doc('0').update(round, FieldValue.apply())
       .catch(reason => console.log(reason))
       .then(value1 => console.log(value1));
 
-    this.currentPlayerRound.push(count);
+    // this.currentPlayerRound.push(count);
     this.countDouble = false;
     this.countTriple = false;
-    if (this.currentPlayerRound.length === 2) {
+    if (this.currentPlayer.round.length % 3 === 2) {
       this.nextPlayer();
     }
   }
@@ -84,7 +83,7 @@ export class GameComponent implements OnInit {
   }
 
   public undo() {
-    this.currentPlayerRound.pop();
+    this.currentPlayer.round.pop();
   }
 
   private nextPlayer() {

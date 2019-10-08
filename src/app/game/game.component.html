@@ -7,13 +7,13 @@
         {{currentPlayer?.name}}
       </div>
       <div class="col">
-        {{currentPlayerRound[0] !== undefined ? currentPlayerRound[0] : '-'}}
+        {{currentPlayer.round[currentPlayer.round.length-1%3] !== undefined ? currentPlayer.round[currentPlayer.round.length-1%3] : '-'}}
       </div>
       <div class="col">
-        {{currentPlayerRound[1] !== undefined ? currentPlayerRound[1] : '-'}}
+        {{currentPlayer.round[currentPlayer.round.length-1%3+1] !== undefined ? currentPlayer.round[currentPlayer.round.length-1%3+1] : '-'}}
       </div>
       <div class="col">
-        {{currentPlayerRound[2] !== undefined ? currentPlayerRound[2] : '-'}}
+        {{currentPlayer.round[currentPlayer.round.length-1%3+2] !== undefined ? currentPlayer.round[currentPlayer.round.length-1%3+2] : '-'}}
       </div>
     </div>
     <div class="col">
