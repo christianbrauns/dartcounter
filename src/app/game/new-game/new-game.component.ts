@@ -60,10 +60,13 @@ export class NewGameComponent implements OnInit {
 
   public startGame() {
     const newGame: GameData = this.gameForm.value as GameData;
-    // newGame.players.forEach(value => value.round = []);
+    newGame.players.forEach(value => value.throws = []);
     this.db.collection('games').add(newGame)
       .then(value => {
-        newGame.players.forEach((value1, index) => this.db.collection('games').doc(value.id).collection('players').doc(index.toString()).set(value1));
+        newGame.players.forEach(
+          (value1, index) =>
+            this.db.collection('games').doc(value.id).collection('players').doc(index.toString()).set(value1)
+        );
         this.router.navigate(['..', value.id], {relativeTo: this.route});
       })
       .catch(reason => console.log(reason));
