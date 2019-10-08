@@ -20,9 +20,6 @@ export class PlayerComponent implements OnInit {
   public readonly dataSource: Observable<Array<PlayerData>>;
   public displayedColumns: Array<string> = ['position', 'name', 'team'];
 
-  private team: string;
-  private name: string;
-
   constructor(private readonly dialog: MatDialog, private readonly db: AngularFirestore) {
     this.dataSource = this.db.collection<PlayerData>('players').valueChanges();
   }
@@ -33,7 +30,7 @@ export class PlayerComponent implements OnInit {
   public openDialog(): void {
     const dialogRef = this.dialog.open(NewPlayerDialogComponent, {
       width: '250px',
-      data: {name: this.name, team: this.team}
+      data: {name: '', team: ''}
     });
 
     dialogRef.afterClosed().subscribe((result: PlayerData) => {

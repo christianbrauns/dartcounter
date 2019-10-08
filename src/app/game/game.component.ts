@@ -49,7 +49,7 @@ export class GameComponent implements OnInit {
       tap((source: Array<PlayerGameData>) => {
         this.currentPlayer = this.findNextPlayer(source);
         this.currentThrow = this.currentPlayer.throws.length;
-        this.currentPlayerCount = this.currentPlayer.throws.reduce(this.reducer);
+        this.currentPlayerCount = this.getPlayerCount(this.currentPlayer);
 
         if (!this.currentRound) {
           this.currentRound = Math.floor(this.currentPlayer.throws.length / 3);
@@ -119,21 +119,22 @@ export class GameComponent implements OnInit {
     return player.throws.filter(x => x !== null).length;
   }
 
+  public getPlayerCount(player: PlayerGameData): number {
+    return player.throws.reduce(this.reducer, 0);
+  }
+
   private findNextPlayer(source: Array<PlayerGameData>): PlayerGameData {
     let players: Array<PlayerGameData> = source.filter(value => value.throws.length % 3 !== 0);
     if (players.length > 0) {
-      console.log('123');
       return players[0];
     }
 
     players = source.filter(value => value.throws.length % 3 === 0);
-    console.log('456');
 
     let num: number;
 
     for (const player of players) {
       if (num && num > player.throws.length) {
-        console.log('found next: ' + player.name);
 
         return player;
       } else {

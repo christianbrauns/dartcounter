@@ -58,8 +58,8 @@
       <mat-label>Spieler</mat-label>
       <ng-container [formGroup]="pl">
         <mat-form-field>
-          <mat-select (selectionChange)="addPlayer($event.value)" formControlName="name">
-            <mat-option *ngFor="let player of playersData | async" [value]="player.name">{{player.name}}</mat-option>
+          <mat-select formControlName="name">
+            <mat-option *ngFor="let player of players" [value]="player.name">{{player.name}}</mat-option>
           </mat-select>
         </mat-form-field>
       </ng-container>

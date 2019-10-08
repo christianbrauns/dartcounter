@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Observable, ReplaySubject} from 'rxjs';
+import {tap} from 'rxjs/operators';
 import {PlayerData} from '../../player/player.component';
 import {GameData} from '../game.component';
 
@@ -13,26 +13,29 @@ import {GameData} from '../game.component';
 })
 export class NewGameComponent implements OnInit {
   public readonly gameForm: FormGroup;
-  private readonly _players: ReplaySubject<Array<PlayerData>> = new ReplaySubject<Array<PlayerData>>();
-  private readonly selectedPlayers: Array<string> = new Array<string>();
+  public players: Array<PlayerData>;
 
   constructor(private readonly db: AngularFirestore, private readonly formBuilder: FormBuilder, private readonly router: Router,
               private readonly route: ActivatedRoute) {
-    this.db.collection<PlayerData>('players').valueChanges().subscribe(value => this._players.next(value));
-
     this.gameForm = formBuilder.group({
       variant: [{value: 'x01', disabled: true}, Validators.required],
       type: [{value: '301', disabled: false}, Validators.required],
       mode: [{value: 's-out', disabled: false}, Validators.required],
-      players: formBuilder.array([formBuilder.group({
-        name: [],
-      })])
+      players: formBuilder.array([
+        formBuilder.group({
+          name: [],
+        }), formBuilder.group({
+          name: [],
+        })])
     });
+    this.db.collection<PlayerData>('players').valueChanges().pipe(
+      tap(value => this.players = value),
+      tap(value => {
+        ((this.gameForm.controls.players as FormArray).controls[0] as FormGroup).controls.name.setValue(value[0].name);
+        ((this.gameForm.controls.players as FormArray).controls[1] as FormGroup).controls.name.setValue(value[1].name);
+      })
+    ).subscribe();
 
-  }
-
-  public get playersData(): Observable<Array<PlayerData>> {
-    return this._players.asObservable();
   }
 
   public get playersForm(): FormArray {
@@ -42,20 +45,17 @@ export class NewGameComponent implements OnInit {
   public ngOnInit() {
   }
 
-  public addPlayer(value: any) {
-    // (this.gameForm.get('players') as FormArray).push(value);
-    console.log(this.gameForm.value);
-    console.log(this.playersForm.value);
-  }
-
   public lessPlayers() {
     this.playersForm.removeAt(this.playersForm.length - 1);
   }
 
   public moreplayers() {
-    this.playersForm.push(this.formBuilder.group({
-      name: [],
-    }));
+    if (this.players.length >= this.playersForm.length + 1) {
+      this.playersForm.push(this.formBuilder.group({
+        name: [this.players[this.playersForm.length].name],
+      }));
+    }
+
   }
 
   public startGame() {

@@ -20,16 +20,16 @@
 
     <div class="row">
       <div *ngIf="currentPlayer" class="col font-weight-bold text-success">
-        {{gameCount - currentPlayerCount}}<br>
-        {{currentPlayerCount / getTrows(currentPlayer) | number}}
+        <h2>{{gameCount - currentPlayerCount}}</h2><br>
+        {{currentPlayerCount / getTrows(currentPlayer) * 3 | number}}
       </div>
     </div>
   </div>
   <div class="col">
     <div *ngFor="let player of players | async" class="row border">
       {{player.name}}<br>
-      {{gameCount - player.throws.reduce(reducer)}}
-      {{player.throws.reduce(reducer) / getTrows(player) | number}}
+      {{gameCount - getPlayerCount(player)}}
+      {{getPlayerCount(player) / getTrows(player) * 3| number}}
     </div>
   </div>
 </div>
