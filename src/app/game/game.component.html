@@ -34,18 +34,11 @@
   </div>
 </div>
 <div class="row mb-3">
-  <div class="col">
-  </div>
-  <div class="col">
-    <!--    <button mat-raised-button>Triple</button>-->
-  </div>
-</div>
-<div class="row mb-3">
   <div class="col text-center">
-    <button (click)="double()" color="{{countDouble?'primary':''}}" mat-raised-button>Double</button>
+    <button (click)="double()" [color]="countDouble ? typeColor('primary') : undefined" mat-raised-button>Double</button>
   </div>
   <div class="col text-center">
-    <button (click)="triple()" color="{{countTriple?'primary':''}}" mat-raised-button>Triple</button>
+    <button (click)="triple()" [color]="countTriple ? typeColor('primary') : undefined" mat-raised-button>Triple</button>
   </div>
 </div>
 <div *ngFor="let i of [].constructor(7) , let x = index" class="row mb-3">

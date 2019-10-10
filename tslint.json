@@ -6,6 +6,7 @@
       "generic"
     ],
     "arrow-parens": false,
+    "ban-types": false,
     "deprecation": {
       "severity": "warning"
     },
@@ -43,11 +44,17 @@
       true,
       {
         "order": [
-          "static-field",
-          "instance-field",
-          "static-method",
-          "instance-method"
-        ]
+          "public-static-field",
+          "public-instance-field",
+          "private-static-field",
+          "private-instance-field",
+          "public-constructor",
+          "private-constructor",
+          "public-instance-method",
+          "protected-instance-method",
+          "private-instance-method"
+        ],
+        "alphabetize": true
       }
     ],
     "no-consecutive-blank-lines": false,

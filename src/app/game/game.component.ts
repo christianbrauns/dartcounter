@@ -1,10 +1,11 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/firestore';
-import {MatProgressBar, MatSnackBar} from '@angular/material';
-import {ActivatedRoute, Router} from '@angular/router';
-import {Observable} from 'rxjs';
-import {tap} from 'rxjs/operators';
-import {PlayerData} from '../player/player.component';
+import { Component, ViewChild } from '@angular/core';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { MatProgressBar, MatSnackBar, ThemePalette } from '@angular/material';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { PlayerData } from '../player/player.component';
+import { typeColor } from '../utils';
 
 export interface GameData {
   id: string;
@@ -23,28 +24,29 @@ export interface PlayerGameData extends PlayerData {
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss'],
 })
-export class GameComponent implements OnInit {
-  @ViewChild(MatProgressBar, {static: false}) public matProgressBar: MatProgressBar;
-  public progressValue: number = 0;
+export class GameComponent {
+
   public countDouble: boolean = false;
   public countTriple: boolean = false;
   public currentPlayer: PlayerGameData;
-  public gameCount: number = 301;
+  public currentPlayerCount: number;
   public currentRound: number;
   public currentThrow: number;
   public readonly game: Observable<GameData>;
+  public gameCount: number;
+  @ViewChild(MatProgressBar, { static: false }) public matProgressBar: MatProgressBar;
   public readonly players: Observable<Array<PlayerGameData>>;
-  public currentPlayerCount: number;
+  public progressValue: number = 0;
   private readonly firebaseGame: AngularFirestoreDocument<GameData>;
 
   constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private snackBar: MatSnackBar,
               private readonly router: Router) {
     this.firebaseGame = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id'));
     this.firebaseGame.valueChanges().pipe(
-      tap(x => this.gameCount = this.getGameCount(x.type))
+      tap(x => this.gameCount = this.getGameCount(x.type)),
     ).subscribe();
 
-    this.players = this.firebaseGame.collection<PlayerGameData>('players').valueChanges({idField: 'id'}).pipe(
+    this.players = this.firebaseGame.collection<PlayerGameData>('players').valueChanges({ idField: 'id' }).pipe(
       tap(x => console.log(x)),
       tap((source: Array<PlayerGameData>) => {
         this.currentPlayer = this.findNextPlayer(source);
@@ -64,11 +66,17 @@ export class GameComponent implements OnInit {
     );
   }
 
-  public reducer = (accumulator, currentValue) => accumulator + currentValue;
-
-  public double() {
+  public double(): void {
     this.countDouble = !this.countDouble;
     this.countTriple = false;
+  }
+
+  public getPlayerCount(player: PlayerGameData): number {
+    return player.throws.reduce(this.reducer, 0);
+  }
+
+  public getTrows(player: PlayerGameData): number {
+    return player.throws.filter(x => x !== null).length;
   }
 
   public hit(value: number) {
@@ -96,16 +104,18 @@ export class GameComponent implements OnInit {
     this.countTriple = false;
 
     if (this.currentPlayerCount + count === this.gameCount) {
-      this.router.navigate(['result'], {relativeTo: this.route});
+      this.router.navigate(['result'], { relativeTo: this.route });
     }
   }
-
-  public ngOnInit() {
-  }
+  public reducer = (accumulator, currentValue) => accumulator + currentValue;
 
   public triple() {
     this.countTriple = !this.countTriple;
     this.countDouble = false;
+  }
+
+  public typeColor(color: string): ThemePalette {
+    return typeColor(color);
   }
 
   public undo() {
@@ -113,14 +123,6 @@ export class GameComponent implements OnInit {
     this.firebaseGame.collection('players').doc(this.currentPlayer.id).update(this.currentPlayer)
       .catch(reason => console.log(reason))
       .then(value1 => console.log(value1));
-  }
-
-  public getTrows(player: PlayerGameData): number {
-    return player.throws.filter(x => x !== null).length;
-  }
-
-  public getPlayerCount(player: PlayerGameData): number {
-    return player.throws.reduce(this.reducer, 0);
   }
 
   private findNextPlayer(source: Array<PlayerGameData>): PlayerGameData {

@@ -54,7 +54,7 @@
     </div>
   </div>
   <div class="row" formArrayName="players">
-    <div *ngFor="let pl of playersForm.controls; let i = index" class="col">
+    <div *ngFor="let pl of playersFormControls; let i = index" class="col">
       <mat-label>Spieler</mat-label>
       <ng-container [formGroup]="pl">
         <mat-form-field>
