@@ -107,7 +107,8 @@ export class GameComponent {
       this.router.navigate(['result'], { relativeTo: this.route });
     }
   }
-  public reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+  public reducer = (accumulator: number, currentValue: number) => accumulator + currentValue;
 
   public triple() {
     this.countTriple = !this.countTriple;
@@ -149,6 +150,7 @@ export class GameComponent {
 
   private getGameCount(type: string): number {
     switch (type) {
+      default:
       case '301':
         return 301;
       case '401':
