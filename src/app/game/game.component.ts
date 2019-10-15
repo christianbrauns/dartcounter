@@ -3,7 +3,7 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firest
 import { MatProgressBar, MatSnackBar, ThemePalette } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { PlayerData } from '../player/player.component';
 import { typeColor } from '../utils';
 
@@ -63,7 +63,10 @@ export class GameComponent {
           }, 1000);
         }
       }),
-      // map(value => )
+      map(value => {
+        const startIndex: number = value.findIndex(x => x.id === this.currentPlayer.id);
+        return value.slice(startIndex + 1, value.length).concat(value.slice(0, startIndex));
+      }),
     );
   }
 
