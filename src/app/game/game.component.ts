@@ -60,9 +60,10 @@ export class GameComponent {
           setTimeout(() => {
             this.currentRound = Math.floor(this.currentPlayer.throws.length / 3);
             this.progressValue = 0;
-          }, 3000);
+          }, 1000);
         }
       }),
+      // map(value => )
     );
   }
 

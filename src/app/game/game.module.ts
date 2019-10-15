@@ -1,6 +1,7 @@
-import {CommonModule} from '@angular/common';
-import {NgModule} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule,
   MatFormFieldModule,
@@ -9,14 +10,13 @@ import {
   MatProgressBarModule,
   MatSelectModule,
   MatSnackBarModule,
-  MatTableModule
+  MatTableModule,
 } from '@angular/material';
-import {RouterModule} from '@angular/router';
-import {GameListComponent} from './game-list/game-list.component';
-import {GameComponent} from './game.component';
-import {NewGameComponent} from './new-game/new-game.component';
-import {ResultComponent} from './result/result.component';
-
+import { RouterModule } from '@angular/router';
+import { GameListComponent } from './game-list/game-list.component';
+import { GameComponent } from './game.component';
+import { NewGameComponent } from './new-game/new-game.component';
+import { ResultComponent } from './result/result.component';
 
 @NgModule({
   declarations: [NewGameComponent, GameComponent, GameListComponent, ResultComponent],
@@ -25,20 +25,20 @@ import {ResultComponent} from './result/result.component';
     RouterModule.forChild([
       {
         path: '',
-        component: GameListComponent
+        component: GameListComponent,
       },
       {
         path: 'new',
-        component: NewGameComponent
+        component: NewGameComponent,
       },
       {
         path: ':id',
-        component: GameComponent
+        component: GameComponent,
       },
       {
         path: ':id/result',
-        component: ResultComponent
-      }
+        component: ResultComponent,
+      },
     ]),
     MatFormFieldModule,
     MatInputModule,
@@ -50,7 +50,8 @@ import {ResultComponent} from './result/result.component';
     MatTableModule,
     MatProgressBarModule,
     MatSnackBarModule,
-  ]
+    ScrollingModule,
+  ],
 })
 export class GameModule {
 }

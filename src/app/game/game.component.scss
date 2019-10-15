@@ -1,0 +1,13 @@
+.mat-button-wide {
+  width: 100% !important;
+  min-width: unset !important;
+}
+
+.v-scroll-viewport {
+  height: 118px;
+
+  &::-webkit-scrollbar {
+    width: 0; /* remove scrollbar space */
+    background: transparent; /* optional: just make scrollbar invisible */
+  }
+}
