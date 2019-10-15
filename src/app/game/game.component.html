@@ -5,9 +5,9 @@
 
     <div class="row h-100">
       <div *ngIf="currentPlayer" class="col-4 font-weight-bold align-self-center">
-        {{currentPlayer?.name}}
-        <h2 class="mb-0 mat-primary-color">{{gameCount - currentPlayerCount}}</h2>
-        <h3>{{currentPlayerCount / getTrows(currentPlayer) * 3 | number}}</h3>
+        <h4 class="mb-2 mt-1">{{currentPlayer?.name}}</h4>
+        <h2 class="my-1 mat-primary-color">{{gameCount - currentPlayerCount}}</h2>
+        <h4 class="mb-1 mt-2">{{currentPlayerCount / getTrows(currentPlayer) * 3 | number}}</h4>
       </div>
 
       <div class="col-8">
@@ -32,7 +32,7 @@
     </div>
   </div>
   <div class="col-4">
-    <cdk-virtual-scroll-viewport itemSize="50" class="v-scroll-viewport">
+    <cdk-virtual-scroll-viewport class="v-scroll-viewport" itemSize="50">
       <div *cdkVirtualFor="let player of players | async" class="row no-gutters p-1 border-bottom">
         <div class="col">{{player.name}}</div>
         <div class="w-100"></div>
@@ -45,35 +45,38 @@
 </div>
 <div class="row mb-3">
   <div class="col text-center">
-    <button class="mat-button-wide" (click)="double()" [color]="countDouble ? typeColor('warn') : undefined" mat-raised-button>Double
+    <button (click)="double()" [color]="countDouble ? typeColor('warn') : undefined" class="mat-button-wide"
+            mat-raised-button>Double
     </button>
   </div>
   <div class="col text-center">
-    <button class="mat-button-wide" (click)="triple()" [color]="countTriple ? typeColor('warn') : undefined" mat-raised-button>Triple
+    <button (click)="triple()" [color]="countTriple ? typeColor('warn') : undefined" class="mat-button-wide"
+            mat-raised-button>Triple
     </button>
   </div>
 </div>
 <div *ngFor="let i of [].constructor(7) , let x = index" class="row mb-3">
   <div class="col text-center">
-    <button class="mat-button-wide" (click)="hit(x * 3 + 1)" color="primary" mat-raised-button>{{x * 3 + 1}}</button>
+    <button (click)="hit(x * 3 + 1)" class="mat-button-wide" color="primary" mat-raised-button>{{x * 3 + 1}}</button>
   </div>
   <div class="col text-center">
-    <button class="mat-button-wide" (click)="hit(x * 3 + 2)" color="primary" mat-raised-button>{{x * 3 + 2}}</button>
+    <button (click)="hit(x * 3 + 2)" class="mat-button-wide" color="primary" mat-raised-button>{{x * 3 + 2}}</button>
   </div>
   <div class="col text-center">
-    <button class="mat-button-wide" (click)="hit(x * 3 + 3)" *ngIf="x<6; else bull" color="primary" mat-raised-button>{{x * 3 + 3}}</button>
+    <button (click)="hit(x * 3 + 3)" *ngIf="x<6; else bull" class="mat-button-wide" color="primary"
+            mat-raised-button>{{x * 3 + 3}}</button>
     <ng-template #bull>
-      <button class="mat-button-wide" (click)="hit(25)" [disabled]="countTriple" color="primary"
+      <button (click)="hit(25)" [disabled]="countTriple" class="mat-button-wide" color="primary"
               mat-raised-button>{{countDouble ? 'Bull’s Eye' : 'Bull'}}</button>
     </ng-template>
   </div>
 </div>
 <div class="row mb-3">
   <div class="col text-center">
-    <button class="mat-button-wide" (click)="hit(0)" mat-raised-button>Ulf</button>
+    <button (click)="hit(0)" class="mat-button-wide" mat-raised-button>Ulf</button>
   </div>
   <div class="col text-center">
-    <button class="mat-button-wide" (click)="undo()" mat-raised-button>Undo</button>
+    <button (click)="undo()" class="mat-button-wide" mat-raised-button>Undo</button>
   </div>
 </div>
 

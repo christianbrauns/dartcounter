@@ -6,6 +6,19 @@
     <td *matCellDef="let element" mat-cell><a [routerLink]="[element.id]">{{element.id}}</a></td>
   </ng-container>
 
+  <ng-container matColumnDef="winner">
+    <th *matHeaderCellDef mat-header-cell> Winner</th>
+    <td *matCellDef="let element" mat-cell>{{element.winner?.name}}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="finished">
+    <th *matHeaderCellDef mat-header-cell> Finished</th>
+    <td *matCellDef="let element" mat-cell>
+      <a *ngIf="!element.finished" [routerLink]="[element.id]">{{element.finished}}</a>
+      <a *ngIf="element.finished" [routerLink]="[element.id, 'result']">{{element.finished}}</a>
+    </td>
+  </ng-container>
+
   <!-- Name Column -->
   <ng-container matColumnDef="mode">
     <th *matHeaderCellDef mat-header-cell> Mode</th>
@@ -18,7 +31,7 @@
   </ng-container>
 
   <ng-container matColumnDef="players">
-    <th *matHeaderCellDef mat-header-cell> Type</th>
+    <th *matHeaderCellDef mat-header-cell> Looser</th>
     <td *matCellDef="let element" mat-cell>
       <ng-container *ngFor="let player of element.players">
         <ng-container *ngIf="player.name">{{player.name}},&nbsp;</ng-container>

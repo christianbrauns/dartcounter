@@ -42,20 +42,22 @@
   </div>
   <div class="row">
     <div class="col">
-      <button (click)="lessPlayers()" mat-mini-fab>
+      <button (click)="lessPlayers()" color="primary" mat-mini-fab>
         <mat-icon>remove</mat-icon>
       </button>
-      <mat-form-field>
-        <input matInput value="{{playersForm.controls.length}}">
+      <mat-form-field class="mx-5" style="width: 50px">
+        <mat-select formControlName="playersCount">
+          <mat-option *ngFor="let item of [].constructor(players?.length); let i = index"
+                      [value]="i+1">{{i + 1}}</mat-option>
+        </mat-select>
       </mat-form-field>
-      <button (click)="moreplayers()" mat-mini-fab>
+      <button (click)="morePlayers()" color="primary" mat-mini-fab>
         <mat-icon>add</mat-icon>
       </button>
     </div>
   </div>
   <div class="row" formArrayName="players">
     <div *ngFor="let pl of playersFormControls; let i = index" class="col">
-      <mat-label>Spieler</mat-label>
       <ng-container [formGroup]="pl">
         <mat-form-field>
           <mat-select formControlName="name">

@@ -1,1 +1,3 @@
-<p>result works!</p>
+<div *ngFor="let player of players | async" class="row col">
+  {{player | json}}
+</div>

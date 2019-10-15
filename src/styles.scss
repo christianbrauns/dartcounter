@@ -39,6 +39,10 @@ $background: map-get($dark-theme, background);
 $background: map_merge($background, (background: $custom-background-color));
 $theme: map_merge($dark-theme, (background: $background));
 
+$primary: mat-color($dark-primary);
+$accent: mat-color($dark-accent);
+$warn: mat-color($dark-warn);
+
 @include angular-material-theme($theme);
 
 @import "node_modules/bootstrap/scss/functions";
@@ -65,5 +69,9 @@ $theme: map_merge($dark-theme, (background: $background));
 //@import "utilities/visibility";
 
 .mat-primary-color {
-  color: #00796b;
+  color: $primary;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

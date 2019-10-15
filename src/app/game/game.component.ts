@@ -1,11 +1,12 @@
-import { Component, ViewChild } from '@angular/core';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { MatProgressBar, MatSnackBar, ThemePalette } from '@angular/material';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { PlayerData } from '../player/player.component';
-import { typeColor } from '../utils';
+import {Component, ViewChild} from '@angular/core';
+import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/firestore';
+import {MatProgressBar, MatSnackBar, ThemePalette} from '@angular/material';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Observable} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
+import {getGameCount} from '../gamerules';
+import {PlayerData} from '../player/player.component';
+import {typeColor} from '../utils';
 
 export interface GameData {
   id: string;
@@ -16,7 +17,7 @@ export interface GameData {
 
 export interface PlayerGameData extends PlayerData {
   id: string;
-  throws: Array<number>;
+  throws?: Array<number>;
 }
 
 @Component({
@@ -34,7 +35,7 @@ export class GameComponent {
   public currentThrow: number;
   public readonly game: Observable<GameData>;
   public gameCount: number;
-  @ViewChild(MatProgressBar, { static: false }) public matProgressBar: MatProgressBar;
+  @ViewChild(MatProgressBar, {static: false}) public matProgressBar: MatProgressBar;
   public readonly players: Observable<Array<PlayerGameData>>;
   public progressValue: number = 0;
   private readonly firebaseGame: AngularFirestoreDocument<GameData>;
@@ -43,10 +44,10 @@ export class GameComponent {
               private readonly router: Router) {
     this.firebaseGame = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id'));
     this.firebaseGame.valueChanges().pipe(
-      tap(x => this.gameCount = this.getGameCount(x.type)),
+      tap(x => this.gameCount = getGameCount(x.type)),
     ).subscribe();
 
-    this.players = this.firebaseGame.collection<PlayerGameData>('players').valueChanges({ idField: 'id' }).pipe(
+    this.players = this.firebaseGame.collection<PlayerGameData>('players').valueChanges({idField: 'id'}).pipe(
       tap(x => console.log(x)),
       tap((source: Array<PlayerGameData>) => {
         this.currentPlayer = this.findNextPlayer(source);
@@ -112,7 +113,7 @@ export class GameComponent {
     this.countTriple = false;
 
     if (this.currentPlayerCount + count === this.gameCount) {
-      this.router.navigate(['result'], { relativeTo: this.route });
+      this.router.navigate(['result'], {relativeTo: this.route});
     }
   }
 
@@ -154,25 +155,5 @@ export class GameComponent {
     }
 
     return players[0];
-  }
-
-  private getGameCount(type: string): number {
-    switch (type) {
-      default:
-      case '301':
-        return 301;
-      case '401':
-        return 401;
-      case '501':
-        return 501;
-      case '601':
-        return 601;
-      case '701':
-        return 701;
-      case '801':
-        return 801;
-      case '901':
-        return 901;
-    }
   }
 }

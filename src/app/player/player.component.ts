@@ -5,8 +5,8 @@ import {Observable} from 'rxjs';
 import {NewPlayerDialogComponent} from './new-player-dialog/new-player-dialog.component';
 
 export interface PlayerData {
-  team: string;
   name: string;
+  team: string;
 }
 
 
