@@ -63,3 +63,7 @@ $theme: map_merge($dark-theme, (background: $background));
 //@import "utilities/spacing";
 //@import "utilities/text";
 //@import "utilities/visibility";
+
+.mat-primary-color {
+  color: #00796b;
+}

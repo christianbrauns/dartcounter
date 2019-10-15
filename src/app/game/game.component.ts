@@ -62,6 +62,10 @@ export class GameComponent {
             this.progressValue = 0;
           }, 1000);
         }
+
+        // this.countOptions =
+        //   { startVal: this.currentPlayer.throws.slice(0, this.currentRound * 3).reduce(this.reducer, 0) } as CountUpOptions;
+
       }),
       map(value => {
         const startIndex: number = value.findIndex(x => x.id === this.currentPlayer.id);

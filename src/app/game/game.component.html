@@ -3,10 +3,10 @@
 <div class="row mb-3">
   <div class="col-8 border">
 
-    <div class="row">
-      <div *ngIf="currentPlayer" class="col-4 font-weight-bold">
+    <div class="row h-100">
+      <div *ngIf="currentPlayer" class="col-4 font-weight-bold align-self-center">
         {{currentPlayer?.name}}
-        <h2 class="font-weight-bold text-success">{{gameCount - currentPlayerCount}}</h2><br>
+        <h2 class="mb-0 mat-primary-color">{{gameCount - currentPlayerCount}}</h2>
         <h3>{{currentPlayerCount / getTrows(currentPlayer) * 3 | number}}</h3>
       </div>
 
