@@ -6,7 +6,7 @@
     <div class="row h-100">
       <div *ngIf="currentPlayer" class="col-4 font-weight-bold align-self-center">
         <h4 class="mb-2 mt-1">{{currentPlayer?.name}}</h4>
-        <h2 class="my-1 mat-primary-color">{{gameCount - currentPlayerCount}}</h2>
+        <h2 class="my-1 mat-primary-color">{{gameDestinationCount - currentPlayerCount}}</h2>
         <h4 class="mb-1 mt-2">{{currentPlayerCount / getTrows(currentPlayer) * 3 | number}}</h4>
       </div>
 
@@ -36,7 +36,7 @@
       <div *cdkVirtualFor="let player of players | async" class="row no-gutters p-1 border-bottom">
         <div class="col">{{player.name}}</div>
         <div class="w-100"></div>
-        <div class="col text-left">{{gameCount - getPlayerCount(player)}}</div>
+        <div class="col text-left">{{gameDestinationCount - getPlayerCount(player)}}</div>
         <div class="col text-right">{{getPlayerCount(player) / getTrows(player) * 3| number}}</div>
       </div>
     </cdk-virtual-scroll-viewport>

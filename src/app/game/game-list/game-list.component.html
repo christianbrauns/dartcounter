@@ -31,7 +31,7 @@
   </ng-container>
 
   <ng-container matColumnDef="players">
-    <th *matHeaderCellDef mat-header-cell> Looser</th>
+    <th *matHeaderCellDef mat-header-cell> Players</th>
     <td *matCellDef="let element" mat-cell>
       <ng-container *ngFor="let player of element.players">
         <ng-container *ngIf="player.name">{{player.name}},&nbsp;</ng-container>

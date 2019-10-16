@@ -75,3 +75,12 @@ $warn: mat-color($dark-warn);
 .cursor-pointer {
   cursor: pointer;
 }
+
+a {
+  color: $primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

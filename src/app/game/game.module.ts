@@ -1,9 +1,10 @@
-import { ScrollingModule } from '@angular/cdk/scrolling';
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {ScrollingModule} from '@angular/cdk/scrolling';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {
   MatButtonModule,
+  MatCardModule,
   MatFormFieldModule,
   MatIconModule,
   MatInputModule,
@@ -12,11 +13,11 @@ import {
   MatSnackBarModule,
   MatTableModule,
 } from '@angular/material';
-import { RouterModule } from '@angular/router';
-import { GameListComponent } from './game-list/game-list.component';
-import { GameComponent } from './game.component';
-import { NewGameComponent } from './new-game/new-game.component';
-import { ResultComponent } from './result/result.component';
+import {RouterModule} from '@angular/router';
+import {GameListComponent} from './game-list/game-list.component';
+import {GameComponent} from './game.component';
+import {NewGameComponent} from './new-game/new-game.component';
+import {ResultComponent} from './result/result.component';
 
 @NgModule({
   declarations: [NewGameComponent, GameComponent, GameListComponent, ResultComponent],
@@ -51,6 +52,7 @@ import { ResultComponent } from './result/result.component';
     MatProgressBarModule,
     MatSnackBarModule,
     ScrollingModule,
+    MatCardModule,
   ],
 })
 export class GameModule {

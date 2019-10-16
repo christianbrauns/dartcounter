@@ -2,13 +2,14 @@ import {Component, ViewChild} from '@angular/core';
 import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/firestore';
 import {MatProgressBar, MatSnackBar, ThemePalette} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Observable} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
+import {interval, Observable} from 'rxjs';
+import {delayWhen, map, tap} from 'rxjs/operators';
 import {getGameCount} from '../gamerules';
 import {PlayerData} from '../player/player.component';
 import {typeColor} from '../utils';
 
 export interface GameData {
+  date: Date;
   id: string;
   mode: string;
   players: Array<PlayerGameData>;
@@ -16,7 +17,6 @@ export interface GameData {
 }
 
 export interface PlayerGameData extends PlayerData {
-  id: string;
   throws?: Array<number>;
 }
 
@@ -26,53 +26,56 @@ export interface PlayerGameData extends PlayerData {
   styleUrls: ['./game.component.scss'],
 })
 export class GameComponent {
-
   public countDouble: boolean = false;
   public countTriple: boolean = false;
-  public currentPlayer: PlayerGameData;
   public currentPlayerCount: number;
   public currentRound: number;
   public currentThrow: number;
-  public readonly game: Observable<GameData>;
-  public gameCount: number;
+  public gameDestinationCount: number;
   @ViewChild(MatProgressBar, {static: false}) public matProgressBar: MatProgressBar;
   public readonly players: Observable<Array<PlayerGameData>>;
   public progressValue: number = 0;
+  private currentPlayerIndex: number;
   private readonly firebaseGame: AngularFirestoreDocument<GameData>;
+  private game: GameData;
+  private inDelay: boolean = false;
 
   constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private snackBar: MatSnackBar,
               private readonly router: Router) {
     this.firebaseGame = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id'));
-    this.firebaseGame.valueChanges().pipe(
-      tap(x => this.gameCount = getGameCount(x.type)),
-    ).subscribe();
 
-    this.players = this.firebaseGame.collection<PlayerGameData>('players').valueChanges({idField: 'id'}).pipe(
-      tap(x => console.log(x)),
-      tap((source: Array<PlayerGameData>) => {
-        this.currentPlayer = this.findNextPlayer(source);
+    this.players = this.firebaseGame.valueChanges().pipe(
+      tap(x => this.game = x),
+      tap(x => this.gameDestinationCount = getGameCount(x.type)),
+      map(value => value.players),
+      tap(x => {
+        if (this.currentPlayerIndex !== undefined && this.findNextPlayerIndex(x) !== this.currentPlayerIndex) {
+          this.inDelay = true;
+        }
+      }),
+      delayWhen(value =>
+        this.currentPlayerIndex !== undefined && this.findNextPlayerIndex(value) !== this.currentPlayerIndex ?
+          interval(2000) : interval(0)),
+      tap(players => {
+        this.inDelay = false;
+
+        this.currentPlayerIndex = this.findNextPlayerIndex(players);
         this.currentThrow = this.currentPlayer.throws.length;
         this.currentPlayerCount = this.getPlayerCount(this.currentPlayer);
 
-        if (!this.currentRound) {
-          this.currentRound = Math.floor(this.currentPlayer.throws.length / 3);
-        } else if (this.currentRound !== Math.floor(this.currentPlayer.throws.length / 3)) {
-          this.progressValue = 1;
-          setTimeout(() => {
-            this.currentRound = Math.floor(this.currentPlayer.throws.length / 3);
-            this.progressValue = 0;
-          }, 1000);
-        }
-
-        // this.countOptions =
-        //   { startVal: this.currentPlayer.throws.slice(0, this.currentRound * 3).reduce(this.reducer, 0) } as CountUpOptions;
-
+        this.currentRound = Math.floor(this.currentPlayer.throws.length / 3);
       }),
-      map(value => {
-        const startIndex: number = value.findIndex(x => x.id === this.currentPlayer.id);
-        return value.slice(startIndex + 1, value.length).concat(value.slice(0, startIndex));
-      }),
+      // provide a sorted array to show next player on top
+      map(value => value.slice(this.currentPlayerIndex + 1, value.length).concat(value.slice(0, this.currentPlayerIndex))),
     );
+  }
+
+  public get currentPlayer(): PlayerGameData | undefined {
+    if (this.game) {
+      return this.game.players[this.currentPlayerIndex];
+    } else {
+      return undefined;
+    }
   }
 
   public double(): void {
@@ -88,13 +91,21 @@ export class GameComponent {
     return player.throws.filter(x => x !== null).length;
   }
 
-  public hit(value: number) {
+  public hit(value: number): void {
+    if (this.inDelay) {
+      return;
+    }
+
     const count: number = this.countTriple ? value * 3 : this.countDouble ? value * 2 : value;
 
-    if (this.currentPlayerCount + count > this.gameCount) {
+    if (this.currentPlayerCount + count > this.gameDestinationCount) {
       this.snackBar.open('Punktzahl Überschritten', '', {
         duration: 3000,
       });
+
+      while (this.currentPlayer.throws.length % 3 !== 0) {
+        this.currentPlayer.throws.pop();
+      }
 
       this.currentPlayer.throws.push(null);
 
@@ -105,14 +116,13 @@ export class GameComponent {
       this.currentPlayer.throws.push(count);
     }
 
-    this.firebaseGame.collection('players').doc(this.currentPlayer.id).update(this.currentPlayer)
-      .catch(reason => console.log(reason))
-      .then(value1 => console.log(value1));
+    this.firebaseGame.update(this.game)
+      .catch(reason => console.log(reason));
 
     this.countDouble = false;
     this.countTriple = false;
 
-    if (this.currentPlayerCount + count === this.gameCount) {
+    if (this.currentPlayerCount + count === this.gameDestinationCount) {
       this.router.navigate(['result'], {relativeTo: this.route});
     }
   }
@@ -128,32 +138,39 @@ export class GameComponent {
     return typeColor(color);
   }
 
-  public undo() {
-    this.currentPlayer.throws.pop();
-    this.firebaseGame.collection('players').doc(this.currentPlayer.id).update(this.currentPlayer)
+  public undo(): void {
+    if (this.currentPlayer.throws.length % 3 === 0 && !this.inDelay) {
+      if (this.currentPlayerIndex === 0) {
+        this.game.players [this.game.players.length - 1].throws.pop();
+      } else {
+        this.game.players [this.currentPlayerIndex - 1].throws.pop();
+      }
+    } else {
+      this.currentPlayer.throws.pop();
+    }
+    this.firebaseGame.update(this.game)
       .catch(reason => console.log(reason))
       .then(value1 => console.log(value1));
+
   }
 
-  private findNextPlayer(source: Array<PlayerGameData>): PlayerGameData {
-    let players: Array<PlayerGameData> = source.filter(value => value.throws.length % 3 !== 0);
-    if (players.length > 0) {
-      return players[0];
+  private findNextPlayerIndex(source: Array<PlayerGameData>): number {
+    let playerIndex: number = source.findIndex(value => value.throws.length % 3 !== 0);
+    if (playerIndex >= 0) {
+      return playerIndex;
     }
-
-    players = source.filter(value => value.throws.length % 3 === 0);
 
     let num: number;
 
-    for (const player of players) {
+    for (const {player, index} of source.map((player, index) => ({player, index}))) {
       if (num && num > player.throws.length) {
 
-        return player;
+        return index;
       } else {
         num = player.throws.length;
       }
     }
 
-    return players[0];
+    return 0;
   }
 }

@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {AngularFirestore} from '@angular/fire/firestore';
-import {Observable, Subject} from 'rxjs';
+import {Observable} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
 import {getGameCount} from '../../gamerules';
 import {reducer} from '../../utils';
 import {GameData, PlayerGameData} from '../game.component';
@@ -16,39 +17,18 @@ export interface GameDataList extends GameData {
   styleUrls: ['./game-list.component.scss']
 })
 export class GameListComponent {
+  public readonly dataSource: Observable<Array<GameDataList>>;
   public displayedColumns: Array<string> = ['winner', 'players', 'mode', 'type', 'finished'];
-  private readonly _dataSource: Subject<Array<GameDataList>> = new Subject<Array<GameDataList>>();
 
   constructor(private readonly db: AngularFirestore) {
-    let list: Array<GameDataList> = new Array<GameDataList>();
-    this.db.collection<GameData>('games').valueChanges({idField: 'id'}).pipe(
-
-    ).subscribe(value => value.forEach(v => this.getPlayers(v.id).subscribe(value1 => {
-      v.players = value1;
-
-      list.push(this.calculate(v));
-
-      this._dataSource.next(list);
-    })));
-
-  }
-
-  public get dataSource(): Observable<Array<GameDataList>> {
-    return this._dataSource.asObservable();
-  }
-
-  private calculate(game: GameData): GameDataList {
-    const winner: PlayerGameData = game.players.sort((a, b) => a.throws.reduce(reducer, 0) - b.throws.reduce(reducer, 0)).pop();
-
-    const gameList: GameDataList = game as GameDataList;
-
-    gameList.finished = winner.throws.reduce(reducer, 0) === getGameCount(game.type);
-    gameList.winner = winner;
-
-    return gameList;
-  }
-
-  private getPlayers(id: string): Observable<Array<PlayerGameData>> {
-    return this.db.collection('games').doc<GameData>(id).collection<PlayerGameData>('players').valueChanges();
+    this.dataSource = this.db.collection<GameData>('games').valueChanges({idField: 'id'}).pipe(
+      map((games: Array<GameData>) => games.map((game: GameData) => Object.assign({}, game as GameDataList))),
+      tap(value => value.forEach(
+        value1 => value1.winner = value1.players.sort(
+          (a, b) => b.throws.reduce(reducer, 0) - a.throws.reduce(reducer, 0))[0]
+        )
+      ),
+      tap(x => x.forEach(game => game.finished = game.winner.throws.reduce(reducer, 0) === getGameCount(game.type))),
+    );
   }
 }

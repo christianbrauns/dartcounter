@@ -6,6 +6,10 @@ import {map, tap} from 'rxjs/operators';
 import {reducer} from '../../utils';
 import {GameData, PlayerGameData} from '../game.component';
 
+export interface PlayerGameDataResult extends PlayerGameData {
+  points: number;
+}
+
 @Component({
   selector: 'ad-result',
   templateUrl: './result.component.html',
@@ -13,17 +17,23 @@ import {GameData, PlayerGameData} from '../game.component';
 })
 export class ResultComponent {
 
-  public readonly players: Observable<Array<PlayerGameData>>;
+  public readonly players: Observable<Array<PlayerGameDataResult>>;
 
   constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute) {
-    this.players = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id'))
-      .collection<PlayerGameData>('players').valueChanges({idField: 'id'}).pipe(
-        tap(x => console.log(x)),
-        map(value => value.sort(
-          (a: PlayerGameData, b: PlayerGameData) => a.throws.reduce(reducer, 0) - b.throws.reduce(reducer, 0)
-        ))
-      );
+    this.players = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id')).valueChanges().pipe(
+      tap(x => console.log(x)),
+      map(value => value.players),
+      map((players: Array<PlayerGameData>) => players.map((player: PlayerGameData) => Object.assign({}, player as PlayerGameDataResult))),
+      tap(value => value.forEach(value1 => value1.points = value1.throws.reduce(reducer, 0))),
+      tap(x => console.log(x)),
+      map(value => value.sort(
+        (a: PlayerGameDataResult, b: PlayerGameDataResult) => b.points - a.points
+      ))
+    );
   }
 
 
+  public getTrownArrows(throws: Array<number>): number {
+    return throws.filter(x => x !== null).length;
+  }
 }

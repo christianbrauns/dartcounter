@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {PlayerData} from '../../player/player.component';
 import {GameData} from '../game.component';
 
@@ -31,6 +31,7 @@ export class NewGameComponent implements OnInit {
     });
 
     this.db.collection<PlayerData>('players').valueChanges().pipe(
+      map(value => value.sort((a, b) => a.name.localeCompare(b.name))),
       tap(value => this.players = value),
       tap(value => {
         // FixMe these values will set again when a new user is created while this form is visible
@@ -78,14 +79,21 @@ export class NewGameComponent implements OnInit {
   }
 
   public startGame() {
-    const newGame: GameData = this.gameForm.value as GameData;
+    const newGame: GameData = {
+      type: this.gameForm.controls.type.value,
+      mode: this.gameForm.controls.mode.value,
+      date: new Date(),
+      players: this.playersForm.value
+    } as GameData;
+
     newGame.players.forEach(value => value.throws = []);
+
     this.db.collection('games').add(newGame)
       .then(value => {
-        newGame.players.forEach(
-          (value1, index) =>
-            this.db.collection('games').doc(value.id).collection('players').doc(index.toString()).set(value1),
-        );
+        // newGame.players.forEach(
+        //   (value1, index) =>
+        //     this.db.collection('games').doc(value.id).collection('players').doc(index.toString()).set(value1),
+        // );
         this.router.navigate(['..', value.id], {relativeTo: this.route});
       })
       .catch(reason => console.log(reason));

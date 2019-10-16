@@ -1,18 +1,25 @@
+<div class="row col mb-3">
+  <button (click)="openDialog()" aria-label="Neuer Spieler" mat-mini-fab>
+    <mat-icon>person_add</mat-icon>
+  </button>
+</div>
+
 <table [dataSource]="dataSource" class="mat-elevation-z8" mat-table>
 
   <!--- Note that these columns can be defined in any order.
         The actual rendered columns are set as a property on the row definition" -->
 
   <!-- Position Column -->
-  <ng-container matColumnDef="position">
-    <th *matHeaderCellDef mat-header-cell> No.</th>
-    <td *matCellDef="let element" mat-cell> {{element.position}} </td>
-  </ng-container>
+  <!--  <ng-container matColumnDef="position">-->
+  <!--    <th *matHeaderCellDef mat-header-cell> No.</th>-->
+  <!--    <td *matCellDef="let element" mat-cell> {{element.position}} </td>-->
+  <!--  </ng-container>-->
 
   <!-- Name Column -->
   <ng-container matColumnDef="name">
     <th *matHeaderCellDef mat-header-cell> Name</th>
-    <td *matCellDef="let element" mat-cell> {{element.name}} </td>
+    <td (click)="editPlayer(element)" *matCellDef="let element" class="cursor-pointer"
+        mat-cell> {{element.name}} </td>
   </ng-container>
 
   <ng-container matColumnDef="team">
@@ -36,6 +43,4 @@
   <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
 </table>
 
-<button (click)="openDialog()" aria-label="Neuer Spieler" mat-mini-fab>
-  <mat-icon>person_add</mat-icon>
-</button>
+

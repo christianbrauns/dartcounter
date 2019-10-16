@@ -1,6 +1,6 @@
 <form [formGroup]="gameForm">
   <div class="row">
-    <div class="col">
+    <div class="col text-center">
       <h4>Spielvariante</h4>
       <mat-form-field>
         <mat-select formControlName="variant">
@@ -11,7 +11,7 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="col">
+    <div class="col text-center">
       <h4>Typ</h4>
       <mat-form-field>
         <mat-select formControlName="type">
@@ -25,7 +25,7 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="col">
+    <div class="col text-center">
       <h4>Modi</h4>
       <mat-form-field>
         <mat-select formControlName="mode">
@@ -41,7 +41,7 @@
 
   </div>
   <div class="row">
-    <div class="col">
+    <div class="col text-center">
       <button (click)="lessPlayers()" color="primary" mat-mini-fab>
         <mat-icon>remove</mat-icon>
       </button>
@@ -57,7 +57,7 @@
     </div>
   </div>
   <div class="row" formArrayName="players">
-    <div *ngFor="let pl of playersFormControls; let i = index" class="col">
+    <div *ngFor="let pl of playersFormControls; let i = index" class="col text-center">
       <ng-container [formGroup]="pl">
         <mat-form-field>
           <mat-select formControlName="name">
@@ -67,7 +67,9 @@
       </ng-container>
     </div>
   </div>
-  <div class="row">
-    <button (click)="startGame()" color="primary" mat-raised-button type="submit">Spiel Starten</button>
+  <div class="row mb-5">
+    <div class="col text-center">
+      <button (click)="startGame()" color="primary" mat-raised-button type="submit">Spiel Starten</button>
+    </div>
   </div>
 </form>
