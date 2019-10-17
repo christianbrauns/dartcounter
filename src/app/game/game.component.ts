@@ -6,7 +6,7 @@ import {interval, Observable} from 'rxjs';
 import {delayWhen, map, tap} from 'rxjs/operators';
 import {getGameCount} from '../gamerules';
 import {PlayerData} from '../player/player.component';
-import {typeColor} from '../utils';
+import {reducer, typeColor} from '../utils';
 
 export interface GameData {
   date: Date;
@@ -17,7 +17,7 @@ export interface GameData {
 }
 
 export interface PlayerGameData extends PlayerData {
-  throws?: Array<number>;
+  throws?: Array<number | string>;
 }
 
 @Component({
@@ -84,7 +84,7 @@ export class GameComponent {
   }
 
   public getPlayerCount(player: PlayerGameData): number {
-    return player.throws.reduce(this.reducer, 0);
+    return Number(player.throws.reduce(reducer, 0));
   }
 
   public getTrows(player: PlayerGameData): number {
@@ -113,7 +113,9 @@ export class GameComponent {
         this.currentPlayer.throws.push(null);
       }
     } else {
-      this.currentPlayer.throws.push(count);
+      const countStr: number | string = this.countTriple ? `T${value}` : this.countDouble ? `D${value}` : value;
+
+      this.currentPlayer.throws.push(countStr);
     }
 
     this.firebaseGame.update(this.game)
@@ -128,8 +130,6 @@ export class GameComponent {
       this.router.navigate(['result'], {relativeTo: this.route});
     }
   }
-
-  public reducer = (accumulator: number, currentValue: number) => accumulator + currentValue;
 
   public triple() {
     this.countTriple = !this.countTriple;

@@ -8,6 +8,14 @@ export function typeColor(color: string): ThemePalette {
   }
 }
 
-export function reducer(accumulator: number, currentValue: number): number {
-  return accumulator + currentValue;
+export function reducer(accumulator: number, currentValue: number | string): number {
+  if (typeof currentValue === 'string') {
+    if (String(currentValue).charAt(0) === 'T') {
+      return Number(currentValue.substr(1)) * 3 + accumulator;
+    } else {
+      return Number(currentValue.substr(1)) * 2 + accumulator;
+    }
+  }
+
+  return accumulator + Number(currentValue);
 }

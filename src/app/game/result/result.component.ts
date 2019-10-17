@@ -24,7 +24,7 @@ export class ResultComponent {
       tap(x => console.log(x)),
       map(value => value.players),
       map((players: Array<PlayerGameData>) => players.map((player: PlayerGameData) => Object.assign({}, player as PlayerGameDataResult))),
-      tap(value => value.forEach(value1 => value1.points = value1.throws.reduce(reducer, 0))),
+      tap(value => value.forEach(value1 => value1.points = Number(value1.throws.reduce(reducer, 0)))),
       tap(x => console.log(x)),
       map(value => value.sort(
         (a: PlayerGameDataResult, b: PlayerGameDataResult) => b.points - a.points

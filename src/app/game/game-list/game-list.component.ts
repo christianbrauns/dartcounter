@@ -25,7 +25,7 @@ export class GameListComponent {
       map((games: Array<GameData>) => games.map((game: GameData) => Object.assign({}, game as GameDataList))),
       tap(value => value.forEach(
         value1 => value1.winner = value1.players.sort(
-          (a, b) => b.throws.reduce(reducer, 0) - a.throws.reduce(reducer, 0))[0]
+          (a, b) => Number(b.throws.reduce(reducer, 0)) - Number(a.throws.reduce(reducer, 0)))[0]
         )
       ),
       tap(x => x.forEach(game => game.finished = game.winner.throws.reduce(reducer, 0) === getGameCount(game.type))),
