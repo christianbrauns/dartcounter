@@ -119,6 +119,8 @@ export class GameComponent {
     this.firebaseGame.update(this.game)
       .catch(reason => console.log(reason));
 
+    this.currentPlayerCount += count;
+
     this.countDouble = false;
     this.countTriple = false;
 
