@@ -7,4 +7,8 @@ import {Component} from '@angular/core';
 })
 export class AppComponent {
   public title: string = 'Aurora Dart';
+
+  public goToIssues(): void {
+    window.open('https://github.com/christianbrauns/dartcounter/issues', '_blank');
+  }
 }
