@@ -53,7 +53,7 @@ import {ResultComponent} from './result/result.component';
     MatSnackBarModule,
     ScrollingModule,
     MatCardModule,
-  ],
+  ]
 })
 export class GameModule {
 }

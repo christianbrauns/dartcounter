@@ -1,7 +1,7 @@
 {
-  "name": "AuroraDart",
+  "name": "Aurora Dart",
   "short_name": "AuroraDart",
-  "theme_color": "#1976d2",
+  "theme_color": "#009688",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "/",

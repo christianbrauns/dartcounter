@@ -1,13 +1,13 @@
 import {NgModule} from '@angular/core';
 import {AngularFireModule} from '@angular/fire';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
-import {MatButtonModule, MatIconModule, MatMenuModule, MatToolbarModule} from '@angular/material';
+import {MatButtonModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatToolbarModule} from '@angular/material';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ServiceWorkerModule} from '@angular/service-worker';
 import {environment} from '../environments/environment';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -23,7 +23,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     MatMenuModule,
     MatIconModule,
     MatButtonModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    MatSnackBarModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production})
   ],
   providers: [],
   bootstrap: [AppComponent]

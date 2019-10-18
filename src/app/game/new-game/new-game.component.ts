@@ -5,6 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {map, tap} from 'rxjs/operators';
 import {PlayerData} from '../../player/player.component';
 import {GameData} from '../game.component';
+import {firestore} from 'firebase';
 
 @Component({
   selector: 'ad-new-game',
@@ -82,7 +83,7 @@ export class NewGameComponent implements OnInit {
     const newGame: GameData = {
       type: this.gameForm.controls.type.value,
       mode: this.gameForm.controls.mode.value,
-      date: new Date(),
+      date: firestore.Timestamp.now(),
       players: this.playersForm.value
     } as GameData;
 

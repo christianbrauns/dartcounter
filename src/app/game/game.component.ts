@@ -2,6 +2,7 @@ import {Component, ViewChild} from '@angular/core';
 import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/firestore';
 import {MatProgressBar, MatSnackBar, ThemePalette} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
+import * as firebase from 'firebase';
 import {interval, Observable} from 'rxjs';
 import {delayWhen, map, tap} from 'rxjs/operators';
 import {getGameCount} from '../gamerules';
@@ -9,7 +10,7 @@ import {PlayerData} from '../player/player.component';
 import {reducer, typeColor} from '../utils';
 
 export interface GameData {
-  date: Date;
+  date: firebase.firestore.Timestamp;
   id: string;
   mode: string;
   players: Array<PlayerGameData>;
@@ -40,7 +41,7 @@ export class GameComponent {
   private game: GameData;
   private inDelay: boolean = false;
 
-  constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private snackBar: MatSnackBar,
+  constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private readonly snackBar: MatSnackBar,
               private readonly router: Router) {
     this.firebaseGame = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id'));
 

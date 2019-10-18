@@ -36,7 +36,7 @@
 
       <ng-container matColumnDef="date">
         <th *matHeaderCellDef mat-header-cell> Datum</th>
-        <td *matCellDef="let element" mat-cell> {{element.date.toLocaleString() }} </td>
+        <td *matCellDef="let element" mat-cell> {{element.date.toDate() | date:'short' }} </td>
       </ng-container>
 
       <ng-container matColumnDef="players">

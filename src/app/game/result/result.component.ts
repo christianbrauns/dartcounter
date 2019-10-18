@@ -33,7 +33,7 @@ export class ResultComponent {
   }
 
 
-  public getTrownArrows(throws: Array<number>): number {
+  public getTrownArrows(throws: Array<number | string>): number {
     return throws.filter(x => x !== null).length;
   }
 }

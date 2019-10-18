@@ -18,7 +18,7 @@ export interface GameDataList extends GameData {
 })
 export class GameListComponent {
   public readonly dataSource: Observable<Array<GameDataList>>;
-  public displayedColumns: Array<string> = ['winner', 'players', 'mode', 'type', 'finished'];
+  public displayedColumns: Array<string> = ['winner', 'players', 'mode', 'type', 'finished', 'date'];
 
   constructor(private readonly db: AngularFirestore) {
     this.dataSource = this.db.collection<GameData>('games').valueChanges({idField: 'id'}).pipe(
