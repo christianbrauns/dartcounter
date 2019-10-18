@@ -1,4 +1,7 @@
-import {NgModule} from '@angular/core';
+import {registerLocaleData} from '@angular/common';
+import localeDe from '@angular/common/locales/de';
+import extraDe from '@angular/common/locales/extra/de';
+import {LOCALE_ID, NgModule} from '@angular/core';
 import {AngularFireModule} from '@angular/fire';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {MatButtonModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatToolbarModule} from '@angular/material';
@@ -8,6 +11,8 @@ import {ServiceWorkerModule} from '@angular/service-worker';
 import {environment} from '../environments/environment';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
+
+registerLocaleData(localeDe, 'de-DE', extraDe);
 
 @NgModule({
   declarations: [
@@ -26,7 +31,9 @@ import {AppComponent} from './app.component';
     MatSnackBarModule,
     ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production})
   ],
-  providers: [],
+  providers: [
+    {provide: LOCALE_ID, useValue: 'de-DE'},
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

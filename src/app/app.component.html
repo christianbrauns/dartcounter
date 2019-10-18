@@ -1,6 +1,5 @@
 <mat-toolbar color="primary">
   <span [routerLink]="['/']" class="cursor-pointer">Aurora Dart</span>
-  <span flex></span>
   <mat-menu #appMenu="matMenu">
     <button mat-menu-item routerLink="game/new">Spiel Starten</button>
     <button mat-menu-item routerLink="player">Spieler</button>
@@ -8,6 +7,9 @@
     <button (click)="goToIssues()" mat-menu-item>Bug gefunden?</button>
   </mat-menu>
   <span class="spacer"></span>
+  <button (click)="doUpdate()" *ngIf="hasUpdate | async" mat-icon-button>
+    <mat-icon color="warn">update</mat-icon>
+  </button>
   <button [matMenuTriggerFor]="appMenu" mat-icon-button>
     <mat-icon>more_vert</mat-icon>
   </button>

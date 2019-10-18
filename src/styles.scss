@@ -72,6 +72,14 @@ $warn: mat-color($dark-warn);
   color: $primary;
 }
 
+.mat-accent-color {
+  color: $accent;
+}
+
+.mat-warn-color {
+  color: $warn;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
