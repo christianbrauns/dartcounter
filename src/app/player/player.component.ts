@@ -8,9 +8,9 @@ import {NewPlayerDialogComponent} from './new-player-dialog/new-player-dialog.co
 export interface PlayerData {
   id: string;
   name: string;
+  photoURL: string;
   team: string;
 }
-
 
 @Component({
   selector: 'ad-player',
