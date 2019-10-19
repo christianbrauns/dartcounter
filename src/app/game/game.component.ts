@@ -1,8 +1,8 @@
 import {Component, ViewChild} from '@angular/core';
-import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/firestore';
+import {AngularFirestore, AngularFirestoreDocument, DocumentReference} from '@angular/fire/firestore';
 import {MatProgressBar, MatSnackBar, ThemePalette} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import * as firebase from 'firebase';
+import {firestore} from 'firebase';
 import {interval, Observable} from 'rxjs';
 import {delayWhen, map, tap} from 'rxjs/operators';
 import {getGameCount} from '../gamerules';
@@ -10,14 +10,16 @@ import {PlayerData} from '../player/player.component';
 import {reducer, typeColor} from '../utils';
 
 export interface GameData {
-  date: firebase.firestore.Timestamp;
+  date: firestore.Timestamp;
   id: string;
   mode: string;
   players: Array<PlayerGameData>;
   type: string;
 }
 
-export interface PlayerGameData extends PlayerData {
+export interface PlayerGameData {
+  player: PlayerData;
+  playerRef: DocumentReference;
   throws?: Array<number | string>;
 }
 
@@ -40,6 +42,7 @@ export class GameComponent {
   private readonly firebaseGame: AngularFirestoreDocument<GameData>;
   private game: GameData;
   private inDelay: boolean = false;
+  private readonly playerDataMap: Map<string, PlayerData> = new Map<string, PlayerData>();
 
   constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private readonly snackBar: MatSnackBar,
               private readonly router: Router) {
@@ -48,6 +51,7 @@ export class GameComponent {
     this.players = this.firebaseGame.valueChanges().pipe(
       tap(x => this.game = x),
       tap(x => this.gameDestinationCount = getGameCount(x.type)),
+      tap(x => x.players.forEach(player => this.loadPlayerData(player))),
       map(value => value.players),
       tap(x => {
         if (this.currentPlayerIndex !== undefined && this.findNextPlayerIndex(x) !== this.currentPlayerIndex) {
@@ -175,5 +179,17 @@ export class GameComponent {
     }
 
     return 0;
+  }
+
+  private loadPlayerData(player: PlayerGameData) {
+    if (this.playerDataMap.has(player.playerRef.id)) {
+      player.player = this.playerDataMap.get(player.playerRef.id);
+    } else {
+      this.db.doc<PlayerGameData>(player.playerRef).get().subscribe(value => {
+        this.playerDataMap.set(player.playerRef.id, value.data() as PlayerData);
+        player.player = value.data() as PlayerData;
+      });
+    }
+
   }
 }

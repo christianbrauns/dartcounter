@@ -2,10 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
+import {firestore} from 'firebase';
 import {map, tap} from 'rxjs/operators';
 import {PlayerData} from '../../player/player.component';
-import {GameData} from '../game.component';
-import {firestore} from 'firebase';
+import {GameData, PlayerGameData} from '../game.component';
 
 @Component({
   selector: 'ad-new-game',
@@ -25,19 +25,19 @@ export class NewGameComponent implements OnInit {
       playersCount: [{value: 2, disabled: false}, Validators.required],
       players: formBuilder.array([
         formBuilder.group({
-          name: [],
+          id: [],
         }), formBuilder.group({
-          name: [],
+          id: [],
         })]),
     });
 
-    this.db.collection<PlayerData>('players').valueChanges().pipe(
+    this.db.collection<PlayerData>('players').valueChanges({idField: 'id'}).pipe(
       map(value => value.sort((a, b) => a.name.localeCompare(b.name))),
       tap(value => this.players = value),
       tap(value => {
         // FixMe these values will set again when a new user is created while this form is visible
-        ((this.gameForm.controls.players as FormArray).controls[0] as FormGroup).controls.name.setValue(value[0].name);
-        ((this.gameForm.controls.players as FormArray).controls[1] as FormGroup).controls.name.setValue(value[1].name);
+        ((this.gameForm.controls.players as FormArray).controls[0] as FormGroup).controls.id.setValue(value[0].id);
+        ((this.gameForm.controls.players as FormArray).controls[1] as FormGroup).controls.id.setValue(value[1].id);
       }),
     ).subscribe();
 
@@ -80,21 +80,18 @@ export class NewGameComponent implements OnInit {
   }
 
   public startGame() {
+
     const newGame: GameData = {
       type: this.gameForm.controls.type.value,
       mode: this.gameForm.controls.mode.value,
       date: firestore.Timestamp.now(),
-      players: this.playersForm.value
+      players: Array.from<PlayerData>(this.playersForm.value).map(value => {
+        return {playerRef: this.db.collection<PlayerData>('players').doc(value.id).ref, throws: []} as PlayerGameData;
+      }),
     } as GameData;
-
-    newGame.players.forEach(value => value.throws = []);
 
     this.db.collection('games').add(newGame)
       .then(value => {
-        // newGame.players.forEach(
-        //   (value1, index) =>
-        //     this.db.collection('games').doc(value.id).collection('players').doc(index.toString()).set(value1),
-        // );
         this.router.navigate(['..', value.id], {relativeTo: this.route});
       })
       .catch(reason => console.log(reason));
