@@ -1,19 +1,19 @@
-import {Component} from '@angular/core';
-import {AngularFireAuth} from '@angular/fire/auth';
-import {MatDialog, MatDialogRef} from '@angular/material';
-import {User} from 'firebase';
-import {Observable} from 'rxjs';
-import {LoginComponent} from './login/login.component';
-import {CheckForUpdateService} from './services/check-for-update.service';
-import {PromptUpdateService} from './services/prompt-update.service';
-import {AngularFirestore} from '@angular/fire/firestore';
-import {PlayerData} from './player/player.component';
+import { Component } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { MatDialog, MatDialogRef } from '@angular/material';
+import { User } from 'firebase';
+import { Observable } from 'rxjs';
+import { LoginComponent } from './login/login.component';
+import { PlayerData } from './player/player.component';
+import { CheckForUpdateService } from './services/check-for-update.service';
+import { PlayerService } from './services/player.service';
+import { PromptUpdateService } from './services/prompt-update.service';
 
 @Component({
   selector: 'ad-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  providers: [PromptUpdateService, CheckForUpdateService]
+  providers: [PromptUpdateService, CheckForUpdateService],
 })
 export class AppComponent {
 
@@ -24,7 +24,7 @@ export class AppComponent {
   private dialogRef: MatDialogRef<LoginComponent>;
 
   constructor(private readonly promptUpdateService: PromptUpdateService, private readonly checkForUpdateService: CheckForUpdateService,
-              private readonly dialog: MatDialog, private readonly afAuth: AngularFireAuth, private readonly db: AngularFirestore) {
+              private readonly dialog: MatDialog, private readonly afAuth: AngularFireAuth, playerService: PlayerService) {
     this.hasUpdate = promptUpdateService.hasUpdate;
     this.afAuth.authState.subscribe(value => {
       if (value && this.dialogRef) {
@@ -36,7 +36,7 @@ export class AppComponent {
 
         console.log(player);
 
-        this.db.collection('players').doc(value.uid).set(player).then(r => console.log(r));
+        playerService.setPlayer(value.uid, player);
       }
     });
 
