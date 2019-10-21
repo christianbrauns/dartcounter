@@ -1,10 +1,13 @@
-import {Component} from '@angular/core';
-import {AngularFirestore} from '@angular/fire/firestore';
-import {Observable} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
-import {getGameCount} from '../../gamerules';
-import {reducer} from '../../utils';
-import {GameData, PlayerGameData} from '../game.component';
+import { Component } from '@angular/core';
+import { DocumentReference } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { getGameCount } from '../../gamerules';
+import { PlayerData } from '../../player/player.component';
+import { GameService } from '../../services/game.service';
+import { PlayerService } from '../../services/player.service';
+import { reducer } from '../../utils/utils';
+import { GameData, PlayerGameData } from '../game.component';
 
 export interface GameDataList extends GameData {
   finished: boolean;
@@ -14,21 +17,31 @@ export interface GameDataList extends GameData {
 @Component({
   selector: 'ad-game-list',
   templateUrl: './game-list.component.html',
-  styleUrls: ['./game-list.component.scss']
+  styleUrls: ['./game-list.component.scss'],
 })
 export class GameListComponent {
   public readonly dataSource: Observable<Array<GameDataList>>;
   public displayedColumns: Array<string> = ['winner', 'players', 'mode', 'type', 'finished', 'date'];
 
-  constructor(private readonly db: AngularFirestore) {
-    this.dataSource = this.db.collection<GameData>('games').valueChanges({idField: 'id'}).pipe(
+  constructor(private readonly gameService: GameService, private readonly playerService: PlayerService) {
+    this.dataSource = gameService.getGames().pipe(
       map((games: Array<GameData>) => games.map((game: GameData) => Object.assign({}, game as GameDataList))),
+      // find winner
       tap(value => value.forEach(
         value1 => value1.winner = value1.players.sort(
-          (a, b) => Number(b.throws.reduce(reducer, 0)) - Number(a.throws.reduce(reducer, 0)))[0]
-        )
+          (a, b) => Number(b.throws.reduce(reducer, 0)) - Number(a.throws.reduce(reducer, 0)))[0],
+        ),
       ),
       tap(x => x.forEach(game => game.finished = game.winner.throws.reduce(reducer, 0) === getGameCount(game.type))),
     );
+  }
+
+  public getPlayerByRef(playerRef: DocumentReference): Observable<PlayerData> | undefined {
+    console.log(playerRef);
+    if (playerRef) {
+      return this.playerService.getPlayer(playerRef.id);
+    } else {
+      return undefined;
+    }
   }
 }

@@ -1,47 +1,51 @@
-import {Component, OnInit} from '@angular/core';
-import {AngularFirestore} from '@angular/fire/firestore';
-import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {map, tap} from 'rxjs/operators';
-import {PlayerData} from '../../player/player.component';
-import {GameData} from '../game.component';
-import {firestore} from 'firebase';
+import { Component } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { firestore } from 'firebase/app';
+import { map, take, takeUntil, tap } from 'rxjs/operators';
+import { PlayerData } from '../../player/player.component';
+import { GameService } from '../../services/game.service';
+import { PlayerService } from '../../services/player.service';
+import { WithDestroy } from '../../utils/with-destroy';
+import { GameData, PlayerGameData } from '../game.component';
 
 @Component({
   selector: 'ad-new-game',
   templateUrl: './new-game.component.html',
   styleUrls: ['./new-game.component.scss'],
 })
-export class NewGameComponent implements OnInit {
+export class NewGameComponent extends WithDestroy() {
   public readonly gameForm: FormGroup;
   public players: Array<PlayerData>;
 
-  constructor(private readonly db: AngularFirestore, private readonly formBuilder: FormBuilder, private readonly router: Router,
-              private readonly route: ActivatedRoute) {
+  constructor(private readonly formBuilder: FormBuilder, private readonly router: Router, private readonly gameService: GameService,
+              private readonly route: ActivatedRoute, private readonly playerService: PlayerService) {
+    super();
     this.gameForm = formBuilder.group({
-      variant: [{value: 'x01', disabled: true}, Validators.required],
-      type: [{value: '301', disabled: false}, Validators.required],
-      mode: [{value: 's-out', disabled: true}, Validators.required],
-      playersCount: [{value: 2, disabled: false}, Validators.required],
+      variant: [{ value: 'x01', disabled: true }, Validators.required],
+      type: [{ value: '301', disabled: false }, Validators.required],
+      mode: [{ value: 's-out', disabled: true }, Validators.required],
+      playersCount: [{ value: 2, disabled: false }, Validators.required],
       players: formBuilder.array([
         formBuilder.group({
-          name: [],
+          playerId: [],
         }), formBuilder.group({
-          name: [],
+          playerId: [],
         })]),
     });
 
-    this.db.collection<PlayerData>('players').valueChanges().pipe(
+    playerService.players.pipe(
+      takeUntil(this.destroy$),
       map(value => value.sort((a, b) => a.name.localeCompare(b.name))),
       tap(value => this.players = value),
       tap(value => {
         // FixMe these values will set again when a new user is created while this form is visible
-        ((this.gameForm.controls.players as FormArray).controls[0] as FormGroup).controls.name.setValue(value[0].name);
-        ((this.gameForm.controls.players as FormArray).controls[1] as FormGroup).controls.name.setValue(value[1].name);
-      }),
-    ).subscribe();
+        ((this.gameForm.controls.players as FormArray).controls[0] as FormGroup).controls.playerId.setValue(value[0].id);
+        ((this.gameForm.controls.players as FormArray).controls[1] as FormGroup).controls.playerId.setValue(value[1].id);
+      })).subscribe();
 
     this.gameForm.controls.playersCount.valueChanges.pipe(
+      takeUntil(this.destroy$),
       tap(x => {
         let diff: number = x - this.playersForm.length;
         if (diff > 0) {
@@ -53,7 +57,7 @@ export class NewGameComponent implements OnInit {
             this.playersForm.removeAt(this.playersForm.length - 1);
           }
         }
-      })
+      }),
     ).subscribe();
 
   }
@@ -76,34 +80,27 @@ export class NewGameComponent implements OnInit {
     this.gameForm.controls.playersCount.setValue(this.playersForm.length);
   }
 
-  public ngOnInit() {
-  }
-
   public startGame() {
+
     const newGame: GameData = {
       type: this.gameForm.controls.type.value,
       mode: this.gameForm.controls.mode.value,
       date: firestore.Timestamp.now(),
-      players: this.playersForm.value
+      players: Array.from<{ playerId: string }>(this.playersForm.value).map(value => {
+        return { playerRef: this.playerService.getPlayerRef(value.playerId), throws: [] } as PlayerGameData;
+      }),
     } as GameData;
 
-    newGame.players.forEach(value => value.throws = []);
-
-    this.db.collection('games').add(newGame)
-      .then(value => {
-        // newGame.players.forEach(
-        //   (value1, index) =>
-        //     this.db.collection('games').doc(value.id).collection('players').doc(index.toString()).set(value1),
-        // );
-        this.router.navigate(['..', value.id], {relativeTo: this.route});
-      })
-      .catch(reason => console.log(reason));
+    this.gameService.addGame(newGame).pipe(
+      take(1),
+      tap(x => this.router.navigate(['..', x.id], { relativeTo: this.route })),
+    ).subscribe();
   }
 
   private createMorePlayers(): void {
     if (this.players.length >= this.playersForm.length + 1) {
       this.playersForm.push(this.formBuilder.group({
-        name: [this.players[this.playersForm.length].name],
+        playerId: [this.players[this.playersForm.length].id],
       }));
     }
   }

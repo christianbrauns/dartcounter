@@ -1,10 +1,13 @@
-import {Component} from '@angular/core';
-import {AngularFirestore} from '@angular/fire/firestore';
-import {ActivatedRoute} from '@angular/router';
-import {Observable} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
-import {reducer} from '../../utils';
-import {GameData, PlayerGameData} from '../game.component';
+import { Component } from '@angular/core';
+import { DocumentReference } from '@angular/fire/firestore';
+import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { PlayerData } from '../../player/player.component';
+import { GameService } from '../../services/game.service';
+import { PlayerService } from '../../services/player.service';
+import { reducer } from '../../utils/utils';
+import { PlayerGameData } from '../game.component';
 
 export interface PlayerGameDataResult extends PlayerGameData {
   points: number;
@@ -13,25 +16,34 @@ export interface PlayerGameDataResult extends PlayerGameData {
 @Component({
   selector: 'ad-result',
   templateUrl: './result.component.html',
-  styleUrls: ['./result.component.scss']
+  styleUrls: ['./result.component.scss'],
 })
 export class ResultComponent {
 
   public readonly players: Observable<Array<PlayerGameDataResult>>;
 
-  constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute) {
-    this.players = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id')).valueChanges().pipe(
+  constructor(private readonly gameService: GameService, private readonly route: ActivatedRoute,
+              private readonly playerService: PlayerService) {
+    this.players = gameService.getGameById(route.snapshot.paramMap.get('id')).pipe(
       tap(x => console.log(x)),
       map(value => value.players),
       map((players: Array<PlayerGameData>) => players.map((player: PlayerGameData) => Object.assign({}, player as PlayerGameDataResult))),
       tap(value => value.forEach(value1 => value1.points = Number(value1.throws.reduce(reducer, 0)))),
       tap(x => console.log(x)),
       map(value => value.sort(
-        (a: PlayerGameDataResult, b: PlayerGameDataResult) => b.points - a.points
-      ))
+        (a: PlayerGameDataResult, b: PlayerGameDataResult) => b.points - a.points,
+      )),
     );
   }
 
+  public getPlayerByRef(playerRef: DocumentReference): Observable<PlayerData> | undefined {
+    console.log(playerRef);
+    if (playerRef) {
+      return this.playerService.getPlayer(playerRef.id);
+    } else {
+      return undefined;
+    }
+  }
 
   public getTrownArrows(throws: Array<number | string>): number {
     return throws.filter(x => x !== null).length;

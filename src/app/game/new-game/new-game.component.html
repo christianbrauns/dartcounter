@@ -60,8 +60,8 @@
     <div *ngFor="let pl of playersFormControls; let i = index" class="col text-center">
       <ng-container [formGroup]="pl">
         <mat-form-field>
-          <mat-select formControlName="name">
-            <mat-option *ngFor="let player of players" [value]="player.name">{{player.name}}</mat-option>
+          <mat-select formControlName="playerId">
+            <mat-option *ngFor="let player of players" [value]="player.id">{{player.name}}</mat-option>
           </mat-select>
         </mat-form-field>
       </ng-container>
