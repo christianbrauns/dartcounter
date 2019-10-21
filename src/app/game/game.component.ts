@@ -1,13 +1,14 @@
-import {Component, ViewChild} from '@angular/core';
-import {AngularFirestore, AngularFirestoreDocument, DocumentReference} from '@angular/fire/firestore';
-import {MatProgressBar, MatSnackBar, ThemePalette} from '@angular/material';
-import {ActivatedRoute, Router} from '@angular/router';
-import {firestore} from 'firebase';
-import {interval, Observable} from 'rxjs';
-import {delayWhen, map, tap} from 'rxjs/operators';
-import {getGameCount} from '../gamerules';
-import {PlayerData} from '../player/player.component';
-import {reducer, typeColor} from '../utils';
+import { Component, ViewChild } from '@angular/core';
+import { AngularFirestore, AngularFirestoreDocument, DocumentReference } from '@angular/fire/firestore';
+import { MatProgressBar, MatSnackBar, ThemePalette } from '@angular/material';
+import { ActivatedRoute, Router } from '@angular/router';
+import { firestore } from 'firebase/app';
+import { interval, Observable } from 'rxjs';
+import { delayWhen, map, tap } from 'rxjs/operators';
+import { getGameCount } from '../gamerules';
+import { PlayerData } from '../player/player.component';
+import { PlayerService } from '../services/player.service';
+import { reducer, typeColor } from '../utils/utils';
 
 export interface GameData {
   date: firestore.Timestamp;
@@ -18,7 +19,6 @@ export interface GameData {
 }
 
 export interface PlayerGameData {
-  player: PlayerData;
   playerRef: DocumentReference;
   throws?: Array<number | string>;
 }
@@ -29,38 +29,39 @@ export interface PlayerGameData {
   styleUrls: ['./game.component.scss'],
 })
 export class GameComponent {
+
+  public get currentPlayer(): PlayerGameData | undefined {
+    if (this.game) {
+      return this.game.players[this.currentPlayerIndex];
+    } else {
+      return undefined;
+    }
+  }
+
   public countDouble: boolean = false;
   public countTriple: boolean = false;
   public currentPlayerCount: number;
   public currentRound: number;
   public currentThrow: number;
   public gameDestinationCount: number;
-  @ViewChild(MatProgressBar, {static: false}) public matProgressBar: MatProgressBar;
+  @ViewChild(MatProgressBar, { static: false }) public matProgressBar: MatProgressBar;
   public readonly players: Observable<Array<PlayerGameData>>;
   public progressValue: number = 0;
   private currentPlayerIndex: number;
   private readonly firebaseGame: AngularFirestoreDocument<GameData>;
   private game: GameData;
   private inDelay: boolean = false;
-  private readonly playerDataMap: Map<string, PlayerData> = new Map<string, PlayerData>();
 
   constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private readonly snackBar: MatSnackBar,
-              private readonly router: Router) {
+              private readonly router: Router, private readonly playerService: PlayerService) {
     this.firebaseGame = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id'));
 
     this.players = this.firebaseGame.valueChanges().pipe(
       tap(x => this.game = x),
       tap(x => this.gameDestinationCount = getGameCount(x.type)),
-      tap(x => x.players.forEach(player => this.loadPlayerData(player))),
       map(value => value.players),
-      tap(x => {
-        if (this.currentPlayerIndex !== undefined && this.findNextPlayerIndex(x) !== this.currentPlayerIndex) {
-          this.inDelay = true;
-        }
-      }),
-      delayWhen(value =>
-        this.currentPlayerIndex !== undefined && this.findNextPlayerIndex(value) !== this.currentPlayerIndex ?
-          interval(2000) : interval(0)),
+      tap(x => this.inDelay = this.needDelay(x)),
+      delayWhen(x => this.needDelay(x) ? interval(2000) : interval(0)),
       tap(players => {
         this.inDelay = false;
 
@@ -75,17 +76,17 @@ export class GameComponent {
     );
   }
 
-  public get currentPlayer(): PlayerGameData | undefined {
-    if (this.game) {
-      return this.game.players[this.currentPlayerIndex];
-    } else {
-      return undefined;
-    }
-  }
-
   public double(): void {
     this.countDouble = !this.countDouble;
     this.countTriple = false;
+  }
+
+  public getPlayerByRef(playerRef: DocumentReference): Observable<PlayerData> | undefined {
+    if (playerRef) {
+      return this.playerService.getPlayer(playerRef.id);
+    } else {
+      return undefined;
+    }
   }
 
   public getPlayerCount(player: PlayerGameData): number {
@@ -131,8 +132,8 @@ export class GameComponent {
     this.countDouble = false;
     this.countTriple = false;
 
-    if (this.currentPlayerCount + count === this.gameDestinationCount) {
-      this.router.navigate(['result'], {relativeTo: this.route});
+    if (this.currentPlayerCount === this.gameDestinationCount) {
+      this.router.navigate(['result'], { relativeTo: this.route });
     }
   }
 
@@ -169,7 +170,7 @@ export class GameComponent {
 
     let num: number;
 
-    for (const {player, index} of source.map((player, index) => ({player, index}))) {
+    for (const { player, index } of source.map((player, index) => ({ player, index }))) {
       if (num && num > player.throws.length) {
 
         return index;
@@ -181,15 +182,25 @@ export class GameComponent {
     return 0;
   }
 
-  private loadPlayerData(player: PlayerGameData) {
-    if (this.playerDataMap.has(player.playerRef.id)) {
-      player.player = this.playerDataMap.get(player.playerRef.id);
-    } else {
-      this.db.doc<PlayerGameData>(player.playerRef).get().subscribe(value => {
-        this.playerDataMap.set(player.playerRef.id, value.data() as PlayerData);
-        player.player = value.data() as PlayerData;
-      });
-    }
+  private needDelay(players: Array<PlayerGameData>): boolean {
+    const nextPlayerIndex: number = this.findNextPlayerIndex(players);
 
+    return this.currentPlayerIndex !== undefined &&
+      (nextPlayerIndex === this.currentPlayerIndex + 1 ||
+        (nextPlayerIndex === 0 && this.currentPlayerIndex === players.length - 1));
+
+    // if (this.currentPlayerIndex !== undefined) {
+    //   if (nextPlayerIndex === this.currentPlayerIndex + 1) {
+    //     console.log('wertwertasddfsdfsaddffdg');
+    //     return true;
+    //   } else if (nextPlayerIndex === 0 && this.currentPlayerIndex === players.length - 1) {
+    //     console.log('wertwertasd');
+    //     return true;
+    //   }
+    //
+    //   console.log('asd');
+    // }
+    //
+    // return false;
   }
 }

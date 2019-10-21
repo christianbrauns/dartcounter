@@ -1,5 +1,5 @@
 <mat-card *ngFor="let player of players | async; let i = index" class="mb-3">
-  <h3 class="text-center mat-primary-color">{{i + 1}}. {{player.name}}</h3>
+  <h3 class="text-center mat-primary-color">{{i + 1}}. {{(getPlayerByRef(player.playerRef) | async)?.name}}</h3>
   <div class="row">
     <div class="col text-right">Punkte:</div>
     <div class="col">{{player.points}}</div>

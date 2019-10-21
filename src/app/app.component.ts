@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { MatDialog, MatDialogRef } from '@angular/material';
-import { User } from 'firebase';
+import { User } from 'firebase/app';
 import { Observable } from 'rxjs';
 import { LoginComponent } from './login/login.component';
 import { PlayerData } from './player/player.component';

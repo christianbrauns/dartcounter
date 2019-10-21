@@ -1,12 +1,14 @@
-import {ApplicationRef, Injectable} from '@angular/core';
-import {SwUpdate} from '@angular/service-worker';
-import {concat, interval} from 'rxjs';
-import {first} from 'rxjs/operators';
+import { ApplicationRef, Injectable } from '@angular/core';
+import { SwUpdate } from '@angular/service-worker';
+import { concat, interval } from 'rxjs';
+import { first, takeUntil } from 'rxjs/operators';
+import { WithDestroy } from '../utils/with-destroy';
 
 @Injectable()
-export class CheckForUpdateService {
+export class CheckForUpdateService extends WithDestroy() {
 
   constructor(appRef: ApplicationRef, updates: SwUpdate) {
+    super();
     if (!updates.isEnabled) {
       return;
     }
@@ -15,6 +17,6 @@ export class CheckForUpdateService {
     const everySixHours$ = interval(6 * 60 * 60 * 1000);
     const everySixHoursOnceAppIsStable$ = concat(appIsStable$, everySixHours$);
 
-    everySixHoursOnceAppIsStable$.subscribe(() => updates.checkForUpdate());
+    everySixHoursOnceAppIsStable$.pipe(takeUntil(this.destroy$)).subscribe(() => updates.checkForUpdate());
   }
 }

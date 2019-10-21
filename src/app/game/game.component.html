@@ -5,7 +5,7 @@
 
     <div class="row h-100">
       <div *ngIf="currentPlayer" class="col-4 font-weight-bold align-self-center">
-        <h4 class="mb-2 mt-1">{{currentPlayer?.player?.name}}</h4>
+        <h4 class="mb-2 mt-1">{{(getPlayerByRef(currentPlayer?.playerRef) | async)?.name}}</h4>
         <h2 class="my-1 mat-primary-color">{{gameDestinationCount - currentPlayerCount}}</h2>
         <h4 class="mb-1 mt-2">{{currentPlayerCount / getTrows(currentPlayer) * 3 | number:'0.0-1'}}</h4>
       </div>
@@ -30,8 +30,9 @@
         </div>
         <div class="row h-auto no-gutters">
           <div class="col">
-            <img [src]="currentPlayer?.player?.photoURL" alt="" class="rounded-circle align-self-baseline float-right"
-                 height="35" width="35"/>
+            <img [src]="(getPlayerByRef(currentPlayer?.playerRef) | async)?.photoURL" alt=""
+                 class="rounded-circle align-self-baseline float-right"
+                 height="35" width="35" />
           </div>
         </div>
       </div>
@@ -40,9 +41,9 @@
   <div class="col-4">
     <cdk-virtual-scroll-viewport class="v-scroll-viewport" itemSize="50">
       <div *cdkVirtualFor="let player of players | async" class="row no-gutters p-1 border-bottom">
-        <div class="col">{{player.player?.name}}
-          <img [src]="player.player?.photoURL" alt="" class="rounded-circle align-self-baseline float-right"
-               height="20" width="20"/>
+        <div class="col">{{(getPlayerByRef(player?.playerRef) | async)?.name}}
+          <img [src]="(getPlayerByRef(player?.playerRef) | async)?.photoURL" alt="" class="rounded-circle align-self-baseline float-right"
+               height="20" width="20" />
         </div>
         <div class="w-100"></div>
         <div class="col text-left">{{gameDestinationCount - getPlayerCount(player)}}</div>
