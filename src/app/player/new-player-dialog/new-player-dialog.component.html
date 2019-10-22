@@ -9,4 +9,8 @@
 <div mat-dialog-actions>
   <button (click)="onNoClick()" mat-button>Abbrechen</button>
   <button [mat-dialog-close]="data" cdkFocusInitial mat-button>Ok</button>
+  <button *ngIf="data.id" (click)="onNoClick()" [routerLink]="['player', data.id, 'avatar']" mat-button>
+    <mat-icon>portrait</mat-icon>
+    Avatar
+  </button>
 </div>

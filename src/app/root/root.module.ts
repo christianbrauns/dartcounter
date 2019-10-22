@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireStorageModule } from '@angular/fire/storage';
 import { MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatToolbarModule } from '@angular/material';
 import { environment } from '../../environments/environment';
 import { LoginComponent } from '../login/login.component';
@@ -16,7 +17,7 @@ import { RootComponent } from './root.component';
     CommonModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
-    AngularFirestoreModule,
+    AngularFireStorageModule,
     AngularFireAuthModule,
     MatToolbarModule,
     MatMenuModule,

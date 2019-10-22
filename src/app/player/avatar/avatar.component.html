@@ -1,0 +1,48 @@
+<div class="row">
+  <div class="col">
+    <input id="customFile" type="file" class="d-none" (change)="fileChangeEvent($event)" />
+    <label for="customFile">
+      <mat-icon>add_photo_alternate</mat-icon>&nbsp;
+      <span>Bild wählen</span>
+    </label>
+  </div>
+</div>
+
+<div class="row" *ngIf="croppedImage !== ''">
+  <div class="col">
+    <a (click)="rotateLeft()" mat-fab>
+      <mat-icon>rotate_left</mat-icon>
+    </a>
+    <a (click)="rotateRight()" mat-fab>
+      <mat-icon>rotate_right</mat-icon>
+    </a>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+
+    <image-cropper
+      (imageCropped)="imageCropped($event)"
+      (imageLoaded)="imageLoaded()"
+      (cropperReady)="cropperReady()"
+      (loadImageFailed)="loadImageFailed()"
+    ></image-cropper>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <button mat-raised-button *ngIf="croppedImage !== ''" color="primary" (click)="upload()">
+      <mat-icon>cloud_upload</mat-icon>
+      Speichern
+    </button>
+    <button mat-raised-button *ngIf="croppedImage !== ''" (click)="fileChangeEvent(null)">
+      Abbrechen
+    </button>
+  </div>
+</div>
+<!--<button class="btn btn-secondary m-btn ml-1" type="button" *ngIf="auth.avatarImageSrc.getValue() !== ''"-->
+<!--        (click)="deleteAvatar()">Bild Löschen-->
+<!--</button>-->
+<!--<button class="btn btn-secondary m-btn ml-1" type="button" (click)="update()">getUserupdate</button>-->
+
