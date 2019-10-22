@@ -11,6 +11,7 @@ import {
   MatProgressBarModule,
   MatSelectModule,
   MatSnackBarModule,
+  MatSortModule,
   MatTableModule,
 } from '@angular/material';
 import { RouterModule } from '@angular/router';
@@ -54,6 +55,7 @@ import { ResultComponent } from './result/result.component';
     MatSnackBarModule,
     ScrollingModule,
     MatCardModule,
+    MatSortModule,
   ],
   providers: [
     {

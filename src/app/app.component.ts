@@ -1,61 +1,25 @@
 import { Component } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { MatDialog, MatDialogRef } from '@angular/material';
-import { User } from 'firebase/app';
-import { Observable } from 'rxjs';
-import { LoginComponent } from './login/login.component';
-import { PlayerData } from './player/player.component';
-import { CheckForUpdateService } from './services/check-for-update.service';
-import { PlayerService } from './services/player.service';
-import { PromptUpdateService } from './services/prompt-update.service';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, take, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'ad-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  providers: [PromptUpdateService, CheckForUpdateService],
 })
 export class AppComponent {
 
-  public hasUpdate: Observable<boolean>;
-  public title: string = 'Aurora Dart';
-  public user: Observable<User>;
+  // @ViewChild('splashScreen', { static: true, read: ElementRef })
+  // public splashScreen: ElementRef<HTMLElement>;
 
-  private dialogRef: MatDialogRef<LoginComponent>;
+  public hideSplash: boolean = false;
 
-  constructor(private readonly promptUpdateService: PromptUpdateService, private readonly checkForUpdateService: CheckForUpdateService,
-              private readonly dialog: MatDialog, private readonly afAuth: AngularFireAuth, playerService: PlayerService) {
-    this.hasUpdate = promptUpdateService.hasUpdate;
-    this.afAuth.authState.subscribe(value => {
-      if (value && this.dialogRef) {
-        this.dialogRef.close();
-        const player: PlayerData = {
-          name: value.displayName ? value.displayName : value.email,
-          photoURL: value.photoURL,
-        } as PlayerData;
+  constructor(router: Router) {
+    router.events.pipe(
+      take(1),
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      tap(() => this.hideSplash = true),
+    ).subscribe();
 
-        console.log(player);
-
-        playerService.setPlayer(value.uid, player);
-      }
-    });
-
-    this.user = this.afAuth.user;
-  }
-
-  public doUpdate(): void {
-    this.promptUpdateService.doUpdate();
-  }
-
-  public goToIssues(): void {
-    window.open('https://github.com/christianbrauns/dartcounter/issues', '_blank');
-  }
-
-  public login(): void {
-    this.dialogRef = this.dialog.open(LoginComponent);
-  }
-
-  public logout(): void {
-    this.afAuth.auth.signOut();
   }
 }

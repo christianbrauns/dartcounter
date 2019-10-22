@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { DocumentReference } from '@angular/fire/firestore';
+import { Sort } from '@angular/material';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { getGameCount } from '../../gamerules';
@@ -33,15 +34,19 @@ export class GameListComponent {
         ),
       ),
       tap(x => x.forEach(game => game.finished = game.winner.throws.reduce(reducer, 0) === getGameCount(game.type))),
+      map(value => value.sort((a, b) => b.date.toMillis() - a.date.toMillis())),
     );
   }
 
   public getPlayerByRef(playerRef: DocumentReference): Observable<PlayerData> | undefined {
-    console.log(playerRef);
     if (playerRef) {
       return this.playerService.getPlayer(playerRef.id);
     } else {
       return undefined;
     }
+  }
+
+  public sortData($event: Sort) {
+
   }
 }

@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { map, shareReplay, takeUntil } from 'rxjs/operators';
 import { PlayerData } from '../player/player.component';
 import { WithDestroy } from '../utils/with-destroy';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class PlayerService extends WithDestroy() {
 
   public readonly players: Observable<Array<PlayerData>>;
@@ -21,8 +19,8 @@ export class PlayerService extends WithDestroy() {
     );
   }
 
-  public addPlayer(player: PlayerData): void {
-    this.db.collection('players').add(player).then(r => console.log(r));
+  public addPlayer(player: PlayerData): Observable<DocumentReference> {
+    return from(this.db.collection('players').add(player));
   }
 
   public getPlayer(id: string): Observable<PlayerData> {
@@ -33,11 +31,11 @@ export class PlayerService extends WithDestroy() {
     return this.db.collection<PlayerData>('players').doc(id).ref;
   }
 
-  public setPlayer(id: string, player: PlayerData): void {
-    this.db.collection('players').doc(id).set(player).then(r => console.log(r));
+  public setPlayer(id: string, player: PlayerData): Observable<void> {
+    return from(this.db.collection('players').doc(id).set(player));
   }
 
-  public updatePlayer(id: string, player: PlayerData): void {
-    this.db.collection('players').doc(id).update(player).then(r => console.log(r));
+  public updatePlayer(id: string, player: PlayerData): Observable<void> {
+    return from(this.db.collection('players').doc(id).update(player));
   }
 }
