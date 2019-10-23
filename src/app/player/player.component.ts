@@ -7,7 +7,7 @@ import { NewPlayerDialogComponent } from './new-player-dialog/new-player-dialog.
 export interface PlayerData {
   id: string;
   name: string;
-  photoURL: string;
+  photoURL?: string;
   team: string;
 }
 
@@ -19,7 +19,7 @@ export interface PlayerData {
 export class PlayerComponent {
 
   public readonly dataSource: Observable<Array<PlayerData>>;
-  public displayedColumns: Array<string> = ['name', 'team'];
+  public displayedColumns: Array<string> = ['name', 'team', 'avatar'];
 
   constructor(private readonly dialog: MatDialog, private readonly playerService: PlayerService) {
     this.dataSource = this.playerService.players;

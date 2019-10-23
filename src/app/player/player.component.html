@@ -27,6 +27,14 @@
     <td *matCellDef="let element" mat-cell> {{element.team}} </td>
   </ng-container>
 
+  <ng-container matColumnDef="avatar">
+    <th *matHeaderCellDef mat-header-cell> Avatar</th>
+    <td *matCellDef="let element" mat-cell><img *ngIf="element.photoURL"
+                                                [src]="element.photoURL" alt=""
+                                                class="rounded-circle align-self-baseline"
+                                                height="35" width="35" /></td>
+  </ng-container>
+
   <!--  &lt;!&ndash; Weight Column &ndash;&gt;-->
   <!--  <ng-container matColumnDef="weight">-->
   <!--    <th mat-header-cell *matHeaderCellDef> Weight </th>-->

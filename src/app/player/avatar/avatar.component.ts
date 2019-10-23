@@ -1,6 +1,10 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from '@angular/fire/storage';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
+import { finalize } from 'rxjs/operators';
+import { PlayerService } from '../../services/player.service';
+import { SplashScreenService } from '../../services/splash-screen.service';
 
 @Component({
   selector: 'ad-avatar',
@@ -13,7 +17,9 @@ export class AvatarComponent implements AfterViewInit {
   @ViewChild(ImageCropperComponent, { static: true })
   private imageCropper: ImageCropperComponent;
 
-  constructor(private readonly storage: AngularFireStorage) {
+  constructor(private readonly storage: AngularFireStorage, private readonly splash: SplashScreenService,
+              private readonly route: ActivatedRoute, private readonly playerService: PlayerService, private readonly router: Router) {
+
   }
 
   public cropperReady(): void {
@@ -35,7 +41,7 @@ export class AvatarComponent implements AfterViewInit {
     if (event === null) {
       this.croppedImage = '';
     } else if (event && event.target && event.target.files && event.target.files.length > 0) {
-      // this.spinner.show();
+      this.splash.show();
     }
     this.imageCropper.imageChangedEvent = event;
   }
@@ -45,55 +51,61 @@ export class AvatarComponent implements AfterViewInit {
   }
 
   public imageLoaded(): void {
-    // this.spinner.hide();
-    // show cropper
+    console.log('imageLoaded');
+    this.splash.hide();
   }
 
   public loadImageFailed(): void {
-    // this.spinner.hide();
-    // show message
+    console.log('loadImageFailed');
+    this.splash.hide();
   }
 
   public ngAfterViewInit(): void {
     this.imageCropper.maintainAspectRatio = true;
     this.imageCropper.aspectRatio = 1;
-    this.imageCropper.cropperMinWidth = 100;
-    this.imageCropper.resizeToWidth = 400;
+    this.imageCropper.cropperMinWidth = 50;
+    this.imageCropper.resizeToWidth = 200;
     this.imageCropper.roundCropper = true;
     this.imageCropper.imageQuality = 60;
     this.imageCropper.format = 'jpeg';
     this.imageCropper.onlyScaleDown = true;
-
-    // this.imageCropper.imageChangedEvent(() => {});
   }
 
   public rotateLeft(): void {
-    // this.spinner.show();
-    this.imageCropper.rotateLeft();
+    this.splash.show().onDone(() =>
+      this.imageCropper.rotateLeft(),
+    );
   }
 
   public rotateRight(): void {
-    // this.spinner.show();
-    this.imageCropper.rotateRight();
+    this.splash.show().onDone(() =>
+      this.imageCropper.rotateRight(),
+    );
   }
 
   public upload(): void {
-    console.log(this.croppedImage.substring(23));
-    this.storage.ref('/avatars').child('dsnfksadf')
-      .putString(this.croppedImage.substring(23), 'base64', { contentType: 'image/jpg' });
-    // this.spinner.show();
-    // this.userNetService
-    //   .uploadAvatar(this.croppedImage)
-    //   .pipe(finalize(() => this.spinner.hide()))
-    //   .subscribe((value: boolean) => {
-    //     if (value) {
-    //       this.toastr.success('Das Bild wurde geändert');
-    //       this.auth.avatarImageSrc.next(this.croppedImage);
-    //       this.fileChangeEvent(null);
-    //       this.croppedImage = '';
-    //     } else {
-    //       this.toastr.error('Es ist ein Fehler aufgetreten.');
-    //     }
-    //   });
+    this.splash.show();
+    const regExp: RegExp = /data:image\/([a-zA-Z]*);base64,/g;
+    const b64: string = this.croppedImage.substring(regExp.exec(this.croppedImage)[0].length);
+
+    const playerId: string = this.route.snapshot.paramMap.get('id');
+    // from(
+    const fileRef: AngularFireStorageReference = this.storage.ref('/avatar').child(`${playerId}.jpg`);
+    const task: AngularFireUploadTask = fileRef.putString(b64, 'base64', { contentType: 'image/jpg' });
+    //.then((a: { downloadURL: any; }) => console.log(a.downloadURL));
+
+    task.snapshotChanges().pipe(
+      finalize(() => fileRef.getDownloadURL()
+        .subscribe(value => this.playerService.updatePhoto(playerId, value).pipe(
+          finalize(() => {
+            this.splash.hide();
+            this.router.navigate(['player']);
+          }),
+        ).subscribe()))).subscribe();
+
+    // ).pipe(
+    // finalize(() => this.splash.hide()),
+    // tap(x => x.)
+    // ).subscribe();
   }
 }

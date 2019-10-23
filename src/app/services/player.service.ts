@@ -35,6 +35,10 @@ export class PlayerService extends WithDestroy() {
     return from(this.db.collection('players').doc(id).set(player));
   }
 
+  public updatePhoto(id: string, photoURL: string): Observable<void> {
+    return from(this.db.collection('players').doc(id).update({ photoURL }));
+  }
+
   public updatePlayer(id: string, player: PlayerData): Observable<void> {
     return from(this.db.collection('players').doc(id).update(player));
   }

@@ -61,7 +61,11 @@
       <ng-container [formGroup]="pl">
         <mat-form-field>
           <mat-select formControlName="playerId">
-            <mat-option *ngFor="let player of players" [value]="player.id">{{player.name}}</mat-option>
+            <mat-option *ngFor="let player of players" [value]="player.id">{{player.name}}
+              <!--                            <img *ngIf="player.photoURL" [src]="player.photoURL" alt=""-->
+              <!--                                 class="rounded-circle"-->
+              <!--                                 height="48" width="30" />-->
+            </mat-option>
           </mat-select>
         </mat-form-field>
       </ng-container>
