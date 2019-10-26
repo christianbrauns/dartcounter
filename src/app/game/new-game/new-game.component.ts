@@ -3,11 +3,13 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firestore } from 'firebase/app';
 import { map, take, takeUntil, tap } from 'rxjs/operators';
+
 import { PlayerData } from '../../player/player.component';
 import { GameService } from '../../services/game.service';
 import { PlayerService } from '../../services/player.service';
 import { WithDestroy } from '../../utils/with-destroy';
 import { GameData, PlayerGameData } from '../game.component';
+
 
 @Component({
   selector: 'ad-new-game',
@@ -49,11 +51,11 @@ export class NewGameComponent extends WithDestroy() {
       tap(x => {
         let diff: number = x - this.playersForm.length;
         if (diff > 0) {
-          for (let i = 0; i < diff; i++) {
+          for (let i: number = 0; i < diff; i++) {
             this.createMorePlayers();
           }
         } else {
-          for (let i = 0; diff < i; diff++) {
+          for (const i: number = 0; diff < i; diff++) {
             this.playersForm.removeAt(this.playersForm.length - 1);
           }
         }
@@ -80,7 +82,7 @@ export class NewGameComponent extends WithDestroy() {
     this.gameForm.controls.playersCount.setValue(this.playersForm.length);
   }
 
-  public startGame() {
+  public startGame(): void {
 
     const newGame: GameData = {
       type: this.gameForm.controls.type.value,

@@ -13,7 +13,7 @@ import { Subject } from 'rxjs';
  * if you are using OnDestroy don't forget to call super.ngOnDestroy();
  */
 
-type Constructor<T> = new(...args: any[]) => T;
+type Constructor<T> = new(...args: Array<any>) => T;
 
 export const WithDestroy: Function = <T1 extends Constructor<{}>>(Base: T1 = (class T2 {
 } as any)) => {

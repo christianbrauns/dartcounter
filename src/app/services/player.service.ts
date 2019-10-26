@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { from, Observable } from 'rxjs';
 import { map, shareReplay, takeUntil } from 'rxjs/operators';
+
 import { PlayerData } from '../player/player.component';
 import { WithDestroy } from '../utils/with-destroy';
 

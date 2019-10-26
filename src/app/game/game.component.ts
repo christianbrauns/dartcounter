@@ -1,12 +1,14 @@
 import { Component, ViewChild } from '@angular/core';
-import { AngularFirestore, AngularFirestoreDocument, DocumentReference } from '@angular/fire/firestore';
+import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { MatProgressBar, MatSnackBar, ThemePalette } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firestore } from 'firebase/app';
 import { interval, Observable } from 'rxjs';
 import { delayWhen, map, tap } from 'rxjs/operators';
+
 import { getGameCount } from '../gamerules';
 import { PlayerData } from '../player/player.component';
+import { GameService } from '../services/game.service';
 import { PlayerService } from '../services/player.service';
 import { reducer, typeColor } from '../utils/utils';
 
@@ -30,14 +32,6 @@ export interface PlayerGameData {
 })
 export class GameComponent {
 
-  public get currentPlayer(): PlayerGameData | undefined {
-    if (this.game) {
-      return this.game.players[this.currentPlayerIndex];
-    } else {
-      return undefined;
-    }
-  }
-
   public countDouble: boolean = false;
   public countTriple: boolean = false;
   public currentPlayerCount: number;
@@ -48,15 +42,15 @@ export class GameComponent {
   public readonly players: Observable<Array<PlayerGameData>>;
   public progressValue: number = 0;
   private currentPlayerIndex: number;
-  private readonly firebaseGame: AngularFirestoreDocument<GameData>;
   private game: GameData;
   private inDelay: boolean = false;
+  private readonly gameId: string;
 
   constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private readonly snackBar: MatSnackBar,
-              private readonly router: Router, private readonly playerService: PlayerService) {
-    this.firebaseGame = db.collection('games').doc<GameData>(route.snapshot.paramMap.get('id'));
+              private readonly router: Router, private readonly playerService: PlayerService , private readonly gameService: GameService) {
+    this.gameId = route.snapshot.paramMap.get('id');
 
-    this.players = this.firebaseGame.valueChanges().pipe(
+    this.players = gameService.getChangesGameById(this.gameId).pipe(
       tap(x => this.game = x),
       tap(x => this.gameDestinationCount = getGameCount(x.type)),
       map(value => value.players),
@@ -74,6 +68,14 @@ export class GameComponent {
       // provide a sorted array to show next player on top
       map(value => value.slice(this.currentPlayerIndex + 1, value.length).concat(value.slice(0, this.currentPlayerIndex))),
     );
+  }
+
+  public get currentPlayer(): PlayerGameData | undefined {
+    if (this.game) {
+      return this.game.players[this.currentPlayerIndex];
+    }
+
+    return undefined;
   }
 
   public double(): void {
@@ -105,7 +107,7 @@ export class GameComponent {
     const count: number = this.countTriple ? value * 3 : this.countDouble ? value * 2 : value;
 
     if (this.currentPlayerCount + count > this.gameDestinationCount) {
-      this.snackBar.open('Punktzahl Überschritten', '', {
+      this.snackBar.open('Punktzahl überschritten', '', {
         duration: 3000,
       });
 
@@ -124,8 +126,7 @@ export class GameComponent {
       this.currentPlayer.throws.push(countStr);
     }
 
-    this.firebaseGame.update(this.game)
-      .catch(reason => console.log(reason));
+    this.gameService.updateGame(this.gameId, this.game);
 
     this.currentPlayerCount += count;
 
@@ -137,7 +138,7 @@ export class GameComponent {
     }
   }
 
-  public triple() {
+  public triple(): void {
     this.countTriple = !this.countTriple;
     this.countDouble = false;
   }
@@ -156,14 +157,12 @@ export class GameComponent {
     } else {
       this.currentPlayer.throws.pop();
     }
-    this.firebaseGame.update(this.game)
-      .catch(reason => console.log(reason))
-      .then(value1 => console.log(value1));
 
+    this.gameService.updateGame(this.gameId, this.game);
   }
 
   private findNextPlayerIndex(source: Array<PlayerGameData>): number {
-    let playerIndex: number = source.findIndex(value => value.throws.length % 3 !== 0);
+    const playerIndex: number = source.findIndex(value => value.throws.length % 3 !== 0);
     if (playerIndex >= 0) {
       return playerIndex;
     }
@@ -188,19 +187,5 @@ export class GameComponent {
     return this.currentPlayerIndex !== undefined &&
       (nextPlayerIndex === this.currentPlayerIndex + 1 ||
         (nextPlayerIndex === 0 && this.currentPlayerIndex === players.length - 1));
-
-    // if (this.currentPlayerIndex !== undefined) {
-    //   if (nextPlayerIndex === this.currentPlayerIndex + 1) {
-    //     console.log('wertwertasddfsdfsaddffdg');
-    //     return true;
-    //   } else if (nextPlayerIndex === 0 && this.currentPlayerIndex === players.length - 1) {
-    //     console.log('wertwertasd');
-    //     return true;
-    //   }
-    //
-    //   console.log('asd');
-    // }
-    //
-    // return false;
   }
 }

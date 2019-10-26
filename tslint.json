@@ -1,22 +1,31 @@
 {
+  "extends": [
+    "tslint:recommended",
+    "tslint-eslint-rules",
+    "tslint-config-prettier",
+    "tslint-jasmine-rules"
+  ],
+  "rulesDirectory": [
+    "node_modules/codelyzer"
+  ],
   "rules": {
-    "array-type": [
-      true,
-      "generic"
-    ],
-    "arrow-parens": false,
-    "ban-types": false,
     "deprecation": {
-      "severity": "warning"
+      "severity": "warn"
     },
-    "component-class-suffix": true,
-    "contextual-lifecycle": true,
-    "directive-class-suffix": true,
-    "directive-selector": [
+    "member-access": [
       true,
-      "attribute",
-      "ad",
-      "camelCase"
+      "check-accessor"
+    ],
+    "member-ordering": [
+      true,
+      {
+        "order": "instance-sandwich"
+      }
+    ],
+    "no-focused-tests": true,
+    "no-inferrable-types": [
+      false,
+      "ignore-params"
     ],
     "component-selector": [
       true,
@@ -24,90 +33,143 @@
       "ad",
       "kebab-case"
     ],
+    "array-bracket-spacing": [
+      true,
+      "never"
+    ],
+    "object-curly-spacing": [
+      true,
+      "always"
+    ],
+    "max-classes-per-file": false,
+    "component-class-suffix": true,
+    "directive-class-suffix": true,
+    "directive-selector": [
+      true,
+      "attribute",
+      "ad",
+      "camelCase"
+    ],
+    "import-destructuring-spacing": true,
+    "no-forward-ref": true,
+    "no-input-rename": true,
+    "no-output-on-prefix": true,
+    "no-output-rename": true,
+    "use-life-cycle-interface": true,
+    "use-pipe-transform-interface": true,
+    "no-non-null-assertion": true,
+    "no-switch-case-fall-through": true,
+    "no-empty": false,
+    "jsdoc-format": false,
+    "one-line": [
+      true,
+      "check-open-brace"
+    ],
+    "align": false,
     "import-blacklist": [
       true,
       "rxjs/Rx"
     ],
     "interface-name": false,
-    "max-classes-per-file": false,
-    "max-line-length": [
+    "no-bitwise": true,
+    "no-conditional-assignment": true,
+    "no-console": true,
+    "no-empty-interface": false,
+    "no-string-literal": false,
+    "object-literal-sort-keys": false,
+    "only-arrow-functions": [
       true,
-      140
+      "allow-named-functions"
     ],
-    "member-access": [
-      true,
-      "check-accessor",
-      "check-parameter-property"
-    ],
-    "member-ordering": [
+    "ordered-imports": [
       true,
       {
-        "order": [
-          "public-static-field",
-          "public-instance-field",
-          "private-static-field",
-          "private-instance-field",
-          "public-constructor",
-          "private-constructor",
-          "public-instance-method",
-          "protected-instance-method",
-          "private-instance-method"
-        ],
-        "alphabetize": true
+        "grouped-imports": true,
+        "groups": [
+          {
+            "name": "ad",
+            "match": "^@ad",
+            "order": 20
+          },
+          {
+            "name": "shared-lib",
+            "match": "^@shared-lib",
+            "order": 20
+          },
+          {
+            "name": "relative_paths",
+            "match": "^[.][.]?",
+            "order": 20
+          },
+          {
+            "name": "scoped_paths",
+            "match": "^@",
+            "order": 10
+          },
+          {
+            "name": "absolute_paths",
+            "match": "^[a-zA-Z]",
+            "order": 10
+          },
+          {
+            "match": null,
+            "order": 10
+          }
+        ]
       }
     ],
-    "no-consecutive-blank-lines": false,
-    "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
-    "no-empty": false,
-    "no-non-null-assertion": true,
-    "no-redundant-jsdoc": true,
-    "no-switch-case-fall-through": true,
-    "no-use-before-declare": true,
-    "no-var-requires": false,
-    "object-literal-key-quotes": [
-      true,
-      "as-needed"
-    ],
-    "object-literal-sort-keys": false,
-    "ordered-imports": true,
+    "prefer-for-of": true,
+    "prefer-object-spread": true,
     "quotemark": [
       true,
-      "single"
+      "single",
+      "avoid-escape"
     ],
-    "trailing-comma": false,
-    "no-conflicting-lifecycle": true,
-    "no-host-metadata-property": true,
-    "no-input-rename": true,
-    "no-inputs-metadata-property": true,
-    "no-output-native": true,
-    "no-output-on-prefix": true,
-    "no-output-rename": true,
-    "no-outputs-metadata-property": true,
-    "template-banana-in-box": true,
-    "template-no-negated-async": true,
-    "use-lifecycle-interface": true,
-    "use-pipe-transform-interface": true
-  },
-  "rulesDirectory": [
-    "codelyzer"
-  ],
-  "typedef": [
-    true,
-    "call-signature",
-    "parameter",
-    "property-declaration",
-    "variable-declaration",
-    "member-variable-declaration",
-    "object-destructuring",
-    "array-destructuring"
-  ],
-  "no-any": true,
-  "prefer-const": true
+    "trailing-comma": [
+      false,
+      {
+        "multiline": "always",
+        "singleline": "never"
+      }
+    ],
+    "variable-name": [
+      true,
+      "allow-leading-underscore",
+      "allow-pascal-case",
+      "ban-keywords",
+      "check-format"
+    ],
+    "typedef": [
+      true,
+      "call-signature",
+      "parameter",
+      "member-variable-declaration",
+      "property-declaration",
+      "variable-declaration",
+      "object-destructuring",
+      "array-destructuring"
+    ],
+    "array-type": [
+      true,
+      "generic"
+    ],
+    "typedef-whitespace": [
+      true,
+      {
+        "call-signature": "nospace",
+        "index-signature": "nospace",
+        "parameter": "nospace",
+        "property-declaration": "nospace",
+        "variable-declaration": "nospace"
+      },
+      {
+        "call-signature": "onespace",
+        "index-signature": "onespace",
+        "parameter": "onespace",
+        "property-declaration": "onespace",
+        "variable-declaration": "onespace"
+      }
+    ],
+    "indent": [true, "spaces", 2]
+  }
 }

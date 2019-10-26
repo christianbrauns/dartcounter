@@ -15,6 +15,7 @@ import {
   MatTableModule,
 } from '@angular/material';
 import { RouterModule } from '@angular/router';
+
 import { GameService } from '../services/game.service';
 import { GameListComponent } from './game-list/game-list.component';
 import { GameComponent } from './game.component';

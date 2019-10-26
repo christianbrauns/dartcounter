@@ -3,6 +3,7 @@ import { DocumentReference } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+
 import { PlayerData } from '../../player/player.component';
 import { GameService } from '../../services/game.service';
 import { PlayerService } from '../../services/player.service';
@@ -26,7 +27,7 @@ export class ResultComponent {
               private readonly playerService: PlayerService) {
     this.players = gameService.getGameById(route.snapshot.paramMap.get('id')).pipe(
       map(value => value.players),
-      map((players: Array<PlayerGameData>) => players.map((player: PlayerGameData) => Object.assign({}, player as PlayerGameDataResult))),
+      map((players: Array<PlayerGameData>) => players.map((player: PlayerGameData) => ({ ...player as PlayerGameDataResult }))),
       tap(value => value.forEach(value1 => value1.points = Number(value1.throws.reduce(reducer, 0)))),
       map(value => value.sort(
         (a: PlayerGameDataResult, b: PlayerGameDataResult) => b.points - a.points,

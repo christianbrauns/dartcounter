@@ -3,6 +3,7 @@ import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask 
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 import { finalize } from 'rxjs/operators';
+
 import { PlayerService } from '../../services/player.service';
 import { SplashScreenService } from '../../services/splash-screen.service';
 
@@ -92,7 +93,7 @@ export class AvatarComponent implements AfterViewInit {
     // from(
     const fileRef: AngularFireStorageReference = this.storage.ref('/avatar').child(`${playerId}.jpg`);
     const task: AngularFireUploadTask = fileRef.putString(b64, 'base64', { contentType: 'image/jpg' });
-    //.then((a: { downloadURL: any; }) => console.log(a.downloadURL));
+    // .then((a: { downloadURL: any; }) => console.log(a.downloadURL));
 
     task.snapshotChanges().pipe(
       finalize(() => fileRef.getDownloadURL()

@@ -8,7 +8,7 @@ describe('NewPlayerDialogComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ NewPlayerDialogComponent ]
+      declarations: [NewPlayerDialogComponent]
     })
     .compileComponents();
   }));

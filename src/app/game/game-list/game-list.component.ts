@@ -3,6 +3,7 @@ import { DocumentReference } from '@angular/fire/firestore';
 import { Sort } from '@angular/material';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+
 import { getGameCount } from '../../gamerules';
 import { PlayerData } from '../../player/player.component';
 import { GameService } from '../../services/game.service';
@@ -26,9 +27,9 @@ export class GameListComponent {
 
   constructor(private readonly gameService: GameService, private readonly playerService: PlayerService) {
     this.dataSource = gameService.getGames().pipe(
-      map((games: Array<GameData>) => games.map((game: GameData) => Object.assign({}, game as GameDataList))),
+      map((games: Array<GameData>) => games.map((game: GameData) => ({ ...game as GameDataList }))),
       // find winner
-      tap(value => value.forEach(
+      tap((games: Array<GameDataList>) => games.forEach(
         value1 => value1.winner = value1.players.sort(
           (a, b) => Number(b.throws.reduce(reducer, 0)) - Number(a.throws.reduce(reducer, 0)))[0],
         ),
@@ -46,7 +47,7 @@ export class GameListComponent {
     }
   }
 
-  public sortData($event: Sort) {
+  public sortData($event: Sort): void {
 
   }
 }

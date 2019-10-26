@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
 import { Observable } from 'rxjs';
+
 import { PlayerService } from '../services/player.service';
 import { NewPlayerDialogComponent } from './new-player-dialog/new-player-dialog.component';
 
@@ -26,7 +27,7 @@ export class PlayerComponent {
   }
 
   public editPlayer(playerData: PlayerData): void {
-    const dialogRef = this.dialog.open(NewPlayerDialogComponent, {
+    const dialogRef: MatDialogRef<NewPlayerDialogComponent, PlayerData> = this.dialog.open(NewPlayerDialogComponent, {
       width: '300px',
       data: playerData,
     });
@@ -39,7 +40,7 @@ export class PlayerComponent {
   }
 
   public openDialog(): void {
-    const dialogRef = this.dialog.open(NewPlayerDialogComponent, {
+    const dialogRef: MatDialogRef<NewPlayerDialogComponent, PlayerData> = this.dialog.open(NewPlayerDialogComponent, {
       width: '300px',
       data: { name: '', team: '' },
     });

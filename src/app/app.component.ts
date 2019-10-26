@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+
 import { SplashScreenService } from './services/splash-screen.service';
 
 @Component({

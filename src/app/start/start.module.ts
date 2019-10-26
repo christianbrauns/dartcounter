@@ -1,8 +1,9 @@
-import {CommonModule} from '@angular/common';
-import {NgModule} from '@angular/core';
-import {MatButtonModule} from '@angular/material';
-import {RouterModule} from '@angular/router';
-import {StartComponent} from './start.component';
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { MatButtonModule } from '@angular/material';
+import { RouterModule } from '@angular/router';
+
+import { StartComponent } from './start.component';
 
 
 @NgModule({

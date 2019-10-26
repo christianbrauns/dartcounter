@@ -3,6 +3,7 @@ import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material';
 import { SwUpdate } from '@angular/service-worker';
 import { Observable } from 'rxjs';
 import { map, takeUntil, tap } from 'rxjs/operators';
+
 import { WithDestroy } from '../utils/with-destroy';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class PromptUpdateService extends WithDestroy() {
       takeUntil(this.destroy$),
       map(event => event.available.hash !== event.current.hash),
       tap(() => {
-        const snack: MatSnackBarRef<SimpleSnackBar> = snackBar.open('Update verfügbar', 'Reload', {
+        const snack: MatSnackBarRef<SimpleSnackBar> = snackBar.open('Update verfügbar!', 'Update starten', {
           duration: 10000,
         });
 
