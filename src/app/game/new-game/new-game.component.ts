@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firestore } from 'firebase/app';
@@ -10,18 +10,23 @@ import { PlayerService } from '../../services/player.service';
 import { WithDestroy } from '../../utils/with-destroy';
 import { GameData, PlayerGameData } from '../game.component';
 
-
 @Component({
   selector: 'ad-new-game',
   templateUrl: './new-game.component.html',
   styleUrls: ['./new-game.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NewGameComponent extends WithDestroy() {
   public readonly gameForm: FormGroup;
   public players: Array<PlayerData>;
 
-  constructor(private readonly formBuilder: FormBuilder, private readonly router: Router, private readonly gameService: GameService,
-              private readonly route: ActivatedRoute, private readonly playerService: PlayerService) {
+  constructor(
+    private readonly formBuilder: FormBuilder,
+    private readonly router: Router,
+    private readonly gameService: GameService,
+    private readonly route: ActivatedRoute,
+    private readonly playerService: PlayerService
+  ) {
     super();
     this.gameForm = formBuilder.group({
       variant: [{ value: 'x01', disabled: true }, Validators.required],
@@ -30,38 +35,44 @@ export class NewGameComponent extends WithDestroy() {
       playersCount: [{ value: 2, disabled: false }, Validators.required],
       players: formBuilder.array([
         formBuilder.group({
-          playerId: [],
-        }), formBuilder.group({
-          playerId: [],
-        })]),
+          playerId: []
+        }),
+        formBuilder.group({
+          playerId: []
+        })
+      ])
     });
 
-    playerService.players.pipe(
-      takeUntil(this.destroy$),
-      map(value => value.sort((a, b) => a.name.localeCompare(b.name))),
-      tap(value => this.players = value),
-      tap(value => {
-        // FixMe these values will set again when a new user is created while this form is visible
-        ((this.gameForm.controls.players as FormArray).controls[0] as FormGroup).controls.playerId.setValue(value[0].id);
-        ((this.gameForm.controls.players as FormArray).controls[1] as FormGroup).controls.playerId.setValue(value[1].id);
-      })).subscribe();
+    playerService.players
+      .pipe(
+        takeUntil(this.destroy$),
+        map((value) => value.sort((a, b) => a.name.localeCompare(b.name))),
+        tap((value) => (this.players = value)),
+        tap((value) => {
+          // FixMe these values will set again when a new user is created while this form is visible
+          ((this.gameForm.controls.players as FormArray).controls[0] as FormGroup).controls.playerId.setValue(value[0].id);
+          ((this.gameForm.controls.players as FormArray).controls[1] as FormGroup).controls.playerId.setValue(value[1].id);
+        })
+      )
+      .subscribe();
 
-    this.gameForm.controls.playersCount.valueChanges.pipe(
-      takeUntil(this.destroy$),
-      tap(x => {
-        let diff: number = x - this.playersForm.length;
-        if (diff > 0) {
-          for (let i: number = 0; i < diff; i++) {
-            this.createMorePlayers();
+    this.gameForm.controls.playersCount.valueChanges
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((x) => {
+          let diff: number = x - this.playersForm.length;
+          if (diff > 0) {
+            for (let i: number = 0; i < diff; i++) {
+              this.createMorePlayers();
+            }
+          } else {
+            for (const i: number = 0; diff < i; diff++) {
+              this.playersForm.removeAt(this.playersForm.length - 1);
+            }
           }
-        } else {
-          for (const i: number = 0; diff < i; diff++) {
-            this.playersForm.removeAt(this.playersForm.length - 1);
-          }
-        }
-      }),
-    ).subscribe();
-
+        })
+      )
+      .subscribe();
   }
 
   public get playersForm(): FormArray {
@@ -83,27 +94,31 @@ export class NewGameComponent extends WithDestroy() {
   }
 
   public startGame(): void {
-
     const newGame: GameData = {
       type: this.gameForm.controls.type.value,
       mode: this.gameForm.controls.mode.value,
       date: firestore.Timestamp.now(),
-      players: Array.from<{ playerId: string }>(this.playersForm.value).map(value => {
+      players: Array.from<{ playerId: string }>(this.playersForm.value).map((value) => {
         return { playerRef: this.playerService.getPlayerRef(value.playerId), throws: [] } as PlayerGameData;
-      }),
+      })
     } as GameData;
 
-    this.gameService.addGame(newGame).pipe(
-      take(1),
-      tap(x => this.router.navigate(['..', x.id], { relativeTo: this.route })),
-    ).subscribe();
+    this.gameService
+      .addGame(newGame)
+      .pipe(
+        take(1),
+        tap((x) => this.router.navigate(['..', x.id], { relativeTo: this.route }))
+      )
+      .subscribe();
   }
 
   private createMorePlayers(): void {
     if (this.players.length >= this.playersForm.length + 1) {
-      this.playersForm.push(this.formBuilder.group({
-        playerId: [this.players[this.playersForm.length].id],
-      }));
+      this.playersForm.push(
+        this.formBuilder.group({
+          playerId: [this.players[this.playersForm.length].id]
+        })
+      );
     }
   }
 }

@@ -1,61 +1,80 @@
-<mat-progress-bar #progressBar *ngIf="progressValue!==0" [value]="progressValue"
-                  mode="indeterminate"></mat-progress-bar>
 <div class="row mb-3">
-  <div class="col-8 border">
 
-    <div class="row h-100">
-      <div *ngIf="currentPlayer" class="col-4 font-weight-bold align-self-center">
-        <h4 class="mb-2 mt-1">{{(getPlayerByRef(currentPlayer?.playerRef) | async)?.name}}</h4>
-        <h2 class="my-1 mat-primary-color">{{gameDestinationCount - currentPlayerCount}}</h2>
-        <h4 class="mb-1 mt-2">{{currentPlayerCount / getTrows(currentPlayer) * 3 | number:'0.0-1'}}</h4>
+  <div class="col-7 border p-2">
+
+    <div class="row mt-3 mb-2 no-gutters">
+
+      <div class="col">
+        <span class="my-0" matBadge="{{playerRank(currentPlayer)}}" matBadgeColor="accent"
+              matBadgeOverlap="false">{{(getPlayerByRef(currentPlayer?.playerRef) | async)?.name}}</span>
       </div>
 
-      <div class="col-8">
-        <div class="row mb-2 no-gutters">
-          <div *ngIf="currentRound !== undefined" class="col text-center align-self-center">
-            <h3>
-              {{currentPlayer?.throws[currentRound * 3] !== undefined ? currentPlayer?.throws[currentRound * 3] : '-'}}
-            </h3>
-          </div>
-          <div *ngIf="currentRound !== undefined" class="col text-center align-self-center">
-            <h3>
-              {{currentPlayer?.throws[currentRound * 3 + 1] !== undefined ? currentPlayer?.throws[currentRound * 3 + 1] : '-'}}
-            </h3>
-          </div>
-          <div *ngIf="currentRound !== undefined" class="col text-center align-self-center">
-            <h3>
-              {{currentPlayer?.throws[currentRound * 3 + 2] !== undefined ? currentPlayer?.throws[currentRound * 3 + 2] : '-'}}
-            </h3>
-          </div>
-        </div>
-        <div class="row h-auto no-gutters">
-          <div class="col">
-            <img *ngIf="(getPlayerByRef(currentPlayer?.playerRef) | async)?.photoURL"
-                 [src]="(getPlayerByRef(currentPlayer?.playerRef) | async)?.photoURL" alt=""
-                 class="rounded-circle align-self-baseline float-right"
-                 height="40" width="40"/>
-          </div>
-        </div>
+      <div *ngIf="currentRound !== undefined" class="col-2 text-center">
+        <h3 class="my-0">
+          {{currentPlayer?.throws[currentRound * 3] !== undefined ? currentPlayer?.throws[currentRound * 3] : '-'}}
+        </h3>
+      </div>
+      <div *ngIf="currentRound !== undefined" class="col-2 text-center">
+        <h3 class="my-0">
+          {{currentPlayer?.throws[currentRound * 3 + 1] !== undefined ? currentPlayer?.throws[currentRound * 3 + 1] : '-'}}
+        </h3>
+      </div>
+      <div *ngIf="currentRound !== undefined" class="col-2 text-center">
+        <h3 class="my-0">
+          {{currentPlayer?.throws[currentRound * 3 + 2] !== undefined ? currentPlayer?.throws[currentRound * 3 + 2] : '-'}}
+        </h3>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div  class="col">
+        <h2 class="my-0 mat-primary-color">{{gameDestinationCount - currentPlayerCount}}</h2>
+        <h4 *ngIf="currentPlayer" class="mb-1 mt-2">{{getPlayerAverage(currentPlayer) | number:'0.0-1'}}</h4>
+      </div>
+
+      <div class="col text-right align-self-center">
+        <img *ngIf="(getPlayerByRef(currentPlayer?.playerRef) | async)?.photoURL"
+             [src]="(getPlayerByRef(currentPlayer?.playerRef) | async)?.photoURL" alt=""
+             class="rounded-circle"
+             height="45" width="45"/>
       </div>
     </div>
+
   </div>
-  <div class="col-4">
-    <cdk-virtual-scroll-viewport class="v-scroll-viewport" itemSize="50">
+
+<!--  <div class="col-1 ">-->
+<!--    <div class="row">-->
+<!--      <div class="col text-center">-->
+<!--      <mat-chip-list>-->
+<!--        <mat-chip>{{currentRound+1}}</mat-chip>-->
+<!--      </mat-chip-list>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+  <div class="col-5">
+    <cdk-virtual-scroll-viewport class="v-scroll-viewport" itemSize="47">
+
       <div *cdkVirtualFor="let player of players | async" class="row no-gutters p-1 border-bottom">
-        <div class="col">{{(getPlayerByRef(player?.playerRef) | async)?.name}}
+        <div class="col"><span matBadge="{{playerRank(player)}}" matBadgeColor="accent" matBadgeOverlap="false"
+                               matBadgePosition="above after" matBadgeSize="small">{{(getPlayerByRef(player?.playerRef) | async)?.name}}</span>
           <img *ngIf="(getPlayerByRef(player?.playerRef) | async)?.photoURL"
-               [src]="(getPlayerByRef(player?.playerRef) | async)?.photoURL" alt="" class="rounded-circle align-self-baseline float-right"
-               height="20" width="20" />
+               [src]="(getPlayerByRef(player?.playerRef) | async)?.photoURL" alt=""
+               class="rounded-circle align-self-baseline float-right"
+               height="20" width="20"/>
         </div>
         <div class="w-100"></div>
         <div class="col text-left">{{gameDestinationCount - getPlayerCount(player)}}</div>
-        <div class="col text-right">{{getPlayerCount(player) / getTrows(player) * 3 | number:'0.0-1'}}</div>
-
+        <div class="col text-right">{{getPlayerAverage(player) | number:'0.0-1'}}</div>
       </div>
-    </cdk-virtual-scroll-viewport>
 
+    </cdk-virtual-scroll-viewport>
   </div>
+
 </div>
+
+
 <div class="row mb-3">
   <div class="col text-center">
     <button (click)="double()" [color]="countDouble ? typeColor('warn') : undefined" class="mat-button-wide"
@@ -70,10 +89,12 @@
 </div>
 <div *ngFor="let i of [].constructor(7) , let x = index" class="row mb-3">
   <div class="col text-center">
-    <button (click)="hit(x * 3 + 1)" class="mat-button-wide" color="primary" mat-raised-button>{{x * 3 + 1}}</button>
+    <button (click)="hit(x * 3 + 1)" class="mat-button-wide" color="primary"
+            mat-raised-button>{{x * 3 + 1}}</button>
   </div>
   <div class="col text-center">
-    <button (click)="hit(x * 3 + 2)" class="mat-button-wide" color="primary" mat-raised-button>{{x * 3 + 2}}</button>
+    <button (click)="hit(x * 3 + 2)" class="mat-button-wide" color="primary"
+            mat-raised-button>{{x * 3 + 2}}</button>
   </div>
   <div class="col text-center">
     <button (click)="hit(x * 3 + 3)" *ngIf="x<6; else bull" class="mat-button-wide" color="primary"

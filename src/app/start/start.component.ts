@@ -1,16 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'ad-start',
   templateUrl: './start.component.html',
-  styleUrls: ['./start.component.scss']
+  styleUrls: ['./start.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StartComponent implements OnInit {
-
-  constructor() {
-  }
-
-  public ngOnInit() {
-  }
-
-}
+export class StartComponent {}

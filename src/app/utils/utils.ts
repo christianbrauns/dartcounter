@@ -1,5 +1,7 @@
 import { ThemePalette } from '@angular/material';
 
+import { PlayerGameData } from '../game/game.component';
+
 export function typeColor(color: string): ThemePalette {
   if (color === 'primary' || color === 'accent' || color === 'warn') {
     return color as ThemePalette;
@@ -18,4 +20,8 @@ export function reducer(accumulator: number, currentValue: number | string): num
   }
 
   return accumulator + Number(currentValue);
+}
+
+export function getPlayerCount(player: PlayerGameData): number {
+  return Number(player.throws.reduce(reducer, 0));
 }

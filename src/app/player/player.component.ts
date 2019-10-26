@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { Observable } from 'rxjs';
 
@@ -16,9 +16,9 @@ export interface PlayerData {
   selector: 'ad-player',
   templateUrl: './player.component.html',
   styleUrls: ['./player.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlayerComponent {
-
   public readonly dataSource: Observable<Array<PlayerData>>;
   public displayedColumns: Array<string> = ['name', 'team', 'avatar'];
 
@@ -29,7 +29,7 @@ export class PlayerComponent {
   public editPlayer(playerData: PlayerData): void {
     const dialogRef: MatDialogRef<NewPlayerDialogComponent, PlayerData> = this.dialog.open(NewPlayerDialogComponent, {
       width: '300px',
-      data: playerData,
+      data: playerData
     });
 
     dialogRef.afterClosed().subscribe((result: PlayerData) => {
@@ -42,7 +42,7 @@ export class PlayerComponent {
   public openDialog(): void {
     const dialogRef: MatDialogRef<NewPlayerDialogComponent, PlayerData> = this.dialog.open(NewPlayerDialogComponent, {
       width: '300px',
-      data: { name: '', team: '' },
+      data: { name: '', team: '' }
     });
 
     dialogRef.afterClosed().subscribe((result: PlayerData) => {

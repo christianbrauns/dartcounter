@@ -8,11 +8,10 @@ import {
   MatFormFieldModule,
   MatIconModule,
   MatInputModule,
-  MatProgressBarModule,
   MatSelectModule,
   MatSnackBarModule,
   MatSortModule,
-  MatTableModule,
+  MatTableModule
 } from '@angular/material';
 import { RouterModule } from '@angular/router';
 
@@ -21,6 +20,8 @@ import { GameListComponent } from './game-list/game-list.component';
 import { GameComponent } from './game.component';
 import { NewGameComponent } from './new-game/new-game.component';
 import { ResultComponent } from './result/result.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   declarations: [NewGameComponent, GameComponent, GameListComponent, ResultComponent],
@@ -29,20 +30,20 @@ import { ResultComponent } from './result/result.component';
     RouterModule.forChild([
       {
         path: '',
-        component: GameListComponent,
+        component: GameListComponent
       },
       {
         path: 'new',
-        component: NewGameComponent,
+        component: NewGameComponent
       },
       {
         path: ':id',
-        component: GameComponent,
+        component: GameComponent
       },
       {
         path: ':id/result',
-        component: ResultComponent,
-      },
+        component: ResultComponent
+      }
     ]),
     MatFormFieldModule,
     MatInputModule,
@@ -52,18 +53,18 @@ import { ResultComponent } from './result/result.component';
     MatIconModule,
     MatButtonModule,
     MatTableModule,
-    MatProgressBarModule,
     MatSnackBarModule,
     ScrollingModule,
     MatCardModule,
     MatSortModule,
+    MatChipsModule,
+    MatBadgeModule
   ],
   providers: [
     {
       provide: GameService,
-      useClass: GameService,
-    },
-  ],
+      useClass: GameService
+    }
+  ]
 })
-export class GameModule {
-}
+export class GameModule {}

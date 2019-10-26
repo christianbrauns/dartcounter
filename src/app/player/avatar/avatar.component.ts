@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from '@angular/fire/storage';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
@@ -11,17 +11,20 @@ import { SplashScreenService } from '../../services/splash-screen.service';
   selector: 'ad-avatar',
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AvatarComponent implements AfterViewInit {
-
   public croppedImage: string = '';
   @ViewChild(ImageCropperComponent, { static: true })
   private imageCropper: ImageCropperComponent;
 
-  constructor(private readonly storage: AngularFireStorage, private readonly splash: SplashScreenService,
-              private readonly route: ActivatedRoute, private readonly playerService: PlayerService, private readonly router: Router) {
-
-  }
+  constructor(
+    private readonly storage: AngularFireStorage,
+    private readonly splash: SplashScreenService,
+    private readonly route: ActivatedRoute,
+    private readonly playerService: PlayerService,
+    private readonly router: Router
+  ) {}
 
   public cropperReady(): void {
     // cropper ready
@@ -73,15 +76,11 @@ export class AvatarComponent implements AfterViewInit {
   }
 
   public rotateLeft(): void {
-    this.splash.show().onDone(() =>
-      this.imageCropper.rotateLeft(),
-    );
+    this.splash.show().onDone(() => this.imageCropper.rotateLeft());
   }
 
   public rotateRight(): void {
-    this.splash.show().onDone(() =>
-      this.imageCropper.rotateRight(),
-    );
+    this.splash.show().onDone(() => this.imageCropper.rotateRight());
   }
 
   public upload(): void {
@@ -95,14 +94,24 @@ export class AvatarComponent implements AfterViewInit {
     const task: AngularFireUploadTask = fileRef.putString(b64, 'base64', { contentType: 'image/jpg' });
     // .then((a: { downloadURL: any; }) => console.log(a.downloadURL));
 
-    task.snapshotChanges().pipe(
-      finalize(() => fileRef.getDownloadURL()
-        .subscribe(value => this.playerService.updatePhoto(playerId, value).pipe(
-          finalize(() => {
-            this.splash.hide();
-            this.router.navigate(['player']);
-          }),
-        ).subscribe()))).subscribe();
+    task
+      .snapshotChanges()
+      .pipe(
+        finalize(() =>
+          fileRef.getDownloadURL().subscribe((value) =>
+            this.playerService
+              .updatePhoto(playerId, value)
+              .pipe(
+                finalize(() => {
+                  this.splash.hide();
+                  this.router.navigate(['player']);
+                })
+              )
+              .subscribe()
+          )
+        )
+      )
+      .subscribe();
 
     // ).pipe(
     // finalize(() => this.splash.hide()),
