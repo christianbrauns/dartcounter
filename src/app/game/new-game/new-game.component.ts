@@ -94,13 +94,17 @@ export class NewGameComponent extends WithDestroy() {
   }
 
   public startGame(): void {
+    let players: Array<PlayerGameData> = Array.from<{ playerId: string }>(this.playersForm.value).map((value) => {
+      return { playerRef: this.playerService.getPlayerRef(value.playerId), throws: [] } as PlayerGameData;
+    });
+
+    players = this.shufflePlayers(players);
+
     const newGame: GameData = {
       type: this.gameForm.controls.type.value,
       mode: this.gameForm.controls.mode.value,
       date: firestore.Timestamp.now(),
-      players: Array.from<{ playerId: string }>(this.playersForm.value).map((value) => {
-        return { playerRef: this.playerService.getPlayerRef(value.playerId), throws: [] } as PlayerGameData;
-      })
+      players
     } as GameData;
 
     this.gameService
@@ -120,5 +124,25 @@ export class NewGameComponent extends WithDestroy() {
         })
       );
     }
+  }
+
+  private shufflePlayers<T>(array: Array<T>): Array<T> {
+    let currentIndex: number = array.length;
+    let temporaryValue: T;
+    let randomIndex: number;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+
+    return array;
   }
 }

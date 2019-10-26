@@ -4,7 +4,7 @@ import { MatSnackBar, ThemePalette } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firestore } from 'firebase/app';
 import { interval, Observable } from 'rxjs';
-import { delayWhen, map, tap } from 'rxjs/operators';
+import { delayWhen, finalize, map, take, tap } from 'rxjs/operators';
 
 import { getGameCount } from '../gamerules';
 import { PlayerData } from '../player/player.component';
@@ -136,16 +136,23 @@ export class GameComponent {
       this.currentPlayer.throws.push(countStr);
     }
 
-    this.gameService.updateGame(this.gameId, this.game);
-
     this.currentPlayerCount += count;
+
+    this.gameService
+      .updateGame(this.gameId, this.game)
+      .pipe(
+        take(1),
+        tap(() => console.log('saved')),
+        finalize(() => {
+          if (this.currentPlayerCount === this.gameDestinationCount) {
+            this.router.navigate(['result'], { relativeTo: this.route });
+          }
+        })
+      )
+      .subscribe();
 
     this.countDouble = false;
     this.countTriple = false;
-
-    if (this.currentPlayerCount === this.gameDestinationCount) {
-      this.router.navigate(['result'], { relativeTo: this.route });
-    }
   }
 
   public triple(): void {

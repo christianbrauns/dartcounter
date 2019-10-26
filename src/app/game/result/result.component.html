@@ -1,5 +1,16 @@
 <mat-card *ngFor="let player of players | async; let i = index" class="mb-3">
-  <h3 class="text-center mat-primary-color">{{i + 1}}. {{(getPlayerByRef(player.playerRef) | async)?.name}}</h3>
+  <h3 class="mat-accent-color text-center">{{i + 1}}.</h3>
+  <div class="row">
+    <div *ngIf="(getPlayerByRef(player?.playerRef) | async)?.photoURL" class="col text-right">
+      <img [src]="(getPlayerByRef(player?.playerRef) | async)?.photoURL" alt=""
+           class="rounded-circle" height="45" width="45"/>
+    </div>
+    <div class="col align-self-center">
+      <h3 [ngClass]="{'text-center': !(getPlayerByRef(player?.playerRef) | async)?.photoURL}" class="mat-primary-color my-0">
+        {{(getPlayerByRef(player.playerRef) | async)?.name}}
+      </h3>
+    </div>
+  </div>
   <div class="row">
     <div class="col text-right">Punkte:</div>
     <div class="col">{{player.points}}</div>
