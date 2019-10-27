@@ -170,6 +170,10 @@
         "variable-declaration": "onespace"
       }
     ],
-    "indent": [true, "spaces", 2]
+    "indent": [true, "spaces", 2],
+    "max-line-length": [
+      true,
+      140
+    ]
   }
 }

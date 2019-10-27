@@ -1,9 +1,9 @@
 <mat-toolbar color="primary">
   <span [routerLink]="['/']" class="cursor-pointer">Aurora Dart</span>
   <mat-menu #appMenu="matMenu">
-    <button mat-menu-item routerLink="game/new">Spiel Starten</button>
-    <button mat-menu-item routerLink="player">Spieler</button>
-    <button mat-menu-item routerLink="game">Spiele</button>
+    <button mat-menu-item routerLink="/game/new">Spiel Starten</button>
+    <button mat-menu-item routerLink="/player">Spieler</button>
+    <button mat-menu-item routerLink="/game">Spiele</button>
     <button (click)="goToIssues()" mat-menu-item>Bug gefunden?</button>
     <button (click)="login()" *ngIf="!(user | async); else exit" mat-menu-item>Login</button>
     <ng-template #exit>
