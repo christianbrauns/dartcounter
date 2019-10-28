@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener } from '@angular/core';
 import { AngularFirestore, DocumentReference } from '@angular/fire/firestore';
 import { MatSnackBar, ThemePalette } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +14,7 @@ import { getPlayerCount, typeColor } from '../utils/utils';
 
 export interface GameData {
   date: firestore.Timestamp;
-  id: string;
+  id?: string;
   mode: string;
   players: Array<PlayerGameData>;
   type: string;
@@ -39,24 +39,19 @@ export class GameComponent {
   public currentRound: number;
   public currentThrow: number;
   public gameDestinationCount: number;
-  public readonly players: Observable<Array<PlayerGameData>>;
+  public readonly waitingPlayers: Observable<Array<PlayerGameData>>;
   private currentPlayerIndex: number;
   private game: GameData;
   private inDelay: boolean = false;
   private readonly gameId: string;
-  private ranking: Array<string> = new Array<string>();
 
-  constructor(
-    private readonly db: AngularFirestore,
-    private readonly route: ActivatedRoute,
-    private readonly snackBar: MatSnackBar,
-    private readonly router: Router,
-    private readonly playerService: PlayerService,
-    private readonly gameService: GameService
-  ) {
+  // private ranking: Array<string> = new Array<string>();
+
+  constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private readonly snackBar: MatSnackBar,
+              private readonly router: Router, private readonly playerService: PlayerService, private readonly gameService: GameService) {
     this.gameId = route.snapshot.paramMap.get('id');
 
-    this.players = gameService.getChangesGameById(this.gameId).pipe(
+    this.waitingPlayers = gameService.getChangesGameById(this.gameId).pipe(
       tap(x => (this.game = x)),
       tap(x => (this.gameDestinationCount = getGameCount(x.type))),
       map(value => value.players),
@@ -72,23 +67,25 @@ export class GameComponent {
 
         this.currentRound = Math.floor(this.currentPlayer.throws.length / 3);
       }),
-      tap(players => {
-        this.ranking = players
-          .sort(
-            (a: PlayerGameData, b: PlayerGameData) =>
-              getPlayerCount(b) - getPlayerCount(a)
-          )
-          .map(value => value.playerRef.id);
-      }),
+      // order players by most points
+      // FIXME this is reordering the array inside this.game
+      // tap(players => {
+      //   this.ranking = players.sort(
+      //     (a: PlayerGameData, b: PlayerGameData) =>
+      //       getPlayerCount(b) - getPlayerCount(a)
+      //   ).map(value => value.playerRef.id);
+      // }),
       // provide a sorted array to show next player on top
-      map(value =>
-        value
-          .slice(this.currentPlayerIndex + 1, value.length)
-          .concat(value.slice(0, this.currentPlayerIndex))
+      map(value => value.slice(this.currentPlayerIndex + 1, value.length).concat(value.slice(0, this.currentPlayerIndex))
       )
     );
+  }
 
-    this.players.pipe().subscribe();
+  @HostListener('window:popstate', ['$event'])
+  public onPopState(event: PopStateEvent): void {
+    // FIXME check if game is finished and ask to delete
+    // console.log(event);
+    // console.log('Back button pressed');
   }
 
   public double(): void {
@@ -96,9 +93,7 @@ export class GameComponent {
     this.countTriple = false;
   }
 
-  public getPlayerByRef(
-    playerRef: DocumentReference
-  ): Observable<PlayerData> | undefined {
+  public getPlayerByRef(playerRef: DocumentReference): Observable<PlayerData> | undefined {
     if (playerRef) {
       return this.playerService.getPlayer(playerRef.id);
     } else {
@@ -111,7 +106,12 @@ export class GameComponent {
   }
 
   public getPlayerAverage(player: PlayerGameData): number {
-    return (this.getPlayerCount(player) / this.getTrows(player)) * 3;
+    const throwCount: number = this.getTrows(player);
+    if (throwCount && player) {
+      return (this.getPlayerCount(player) / throwCount) * 3;
+    }
+
+    return 0;
   }
 
   public getTrows(player: PlayerGameData): number {
@@ -123,11 +123,7 @@ export class GameComponent {
       return;
     }
 
-    const count: number = this.countTriple
-      ? value * 3
-      : this.countDouble
-      ? value * 2
-      : value;
+    const count: number = this.countTriple ? value * 3 : this.countDouble ? value * 2 : value;
 
     if (this.currentPlayerCount + count > this.gameDestinationCount) {
       this.snackBar.open('Punktzahl überschritten', '', {
@@ -144,28 +140,22 @@ export class GameComponent {
         this.currentPlayer.throws.push(null);
       }
     } else {
-      const countStr: number | string = this.countTriple
-        ? `T${value}`
-        : this.countDouble
-        ? `D${value}`
-        : value;
+      const countStr: number | string = this.countTriple ? `T${ value }` : this.countDouble ? `D${ value }` : value;
 
       this.currentPlayer.throws.push(countStr);
     }
 
     this.currentPlayerCount += count;
 
-    this.gameService
-      .updateGame(this.gameId, this.game)
-      .pipe(
-        take(1),
-        finalize(() => {
-          if (this.currentPlayerCount === this.gameDestinationCount) {
-            this.router.navigate(['result'], { relativeTo: this.route });
-          }
-        })
-      )
-      .subscribe();
+
+    this.gameService.updateGame(this.gameId, this.game).pipe(
+      take(1),
+      finalize(() => {
+        if (this.currentPlayerCount === this.gameDestinationCount) {
+          this.router.navigate(['result'], { relativeTo: this.route });
+        }
+      })
+    ).subscribe();
 
     this.countDouble = false;
     this.countTriple = false;
@@ -194,9 +184,9 @@ export class GameComponent {
     this.gameService.updateGame(this.gameId, this.game);
   }
 
-  public playerRank(player: PlayerGameData): number {
-    return this.ranking.findIndex(value => value === player.playerRef.id) + 1;
-  }
+  // public playerRank(player: PlayerGameData): number {
+  //   return this.ranking.findIndex(value => value === player.playerRef.id) + 1;
+  // }
 
   private findNextPlayerIndex(source: Array<PlayerGameData>): number {
     const playerIndex: number = source.findIndex(

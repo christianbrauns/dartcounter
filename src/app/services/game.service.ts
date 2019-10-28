@@ -17,7 +17,7 @@ export class GameService {
 
   public getGameById(id: string): Observable<GameData> {
     return from(this.db.collection('games').doc<GameData>(id).get().pipe(
-      map(value => value.data() as GameData)),
+      map(value => value.data() as GameData))
     );
   }
 
@@ -25,8 +25,8 @@ export class GameService {
     return this.db.collection('games').doc<GameData>(id).valueChanges();
   }
 
-  public updateGame(id: string, game: GameData): Observable<void> {
-    return from(this.db.collection('games').doc<GameData>(id).update(game));
+  public updateGame(id: string, game: any): Observable<unknown> {
+    return from(this.db.collection('games').doc<GameData>(id).set(game, { merge: true }));
   }
 
   public getGames(): Observable<Array<GameData>> {
