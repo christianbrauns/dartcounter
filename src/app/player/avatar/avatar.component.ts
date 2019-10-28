@@ -15,8 +15,7 @@ import { SplashScreenService } from '../../services/splash-screen.service';
 })
 export class AvatarComponent implements AfterViewInit {
   public croppedImage: string = '';
-  @ViewChild(ImageCropperComponent, { static: true })
-  private imageCropper: ImageCropperComponent;
+  @ViewChild(ImageCropperComponent, { static: true }) private imageCropper: ImageCropperComponent;
 
   constructor(
     private readonly storage: AngularFireStorage,
@@ -55,12 +54,10 @@ export class AvatarComponent implements AfterViewInit {
   }
 
   public imageLoaded(): void {
-    console.log('imageLoaded');
     this.splash.hide();
   }
 
   public loadImageFailed(): void {
-    console.log('loadImageFailed');
     this.splash.hide();
   }
 

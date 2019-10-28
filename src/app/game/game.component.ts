@@ -57,12 +57,12 @@ export class GameComponent {
     this.gameId = route.snapshot.paramMap.get('id');
 
     this.players = gameService.getChangesGameById(this.gameId).pipe(
-      tap((x) => (this.game = x)),
-      tap((x) => (this.gameDestinationCount = getGameCount(x.type))),
-      map((value) => value.players),
-      tap((x) => (this.inDelay = this.needDelay(x))),
-      delayWhen((x) => (this.needDelay(x) ? interval(2000) : interval(0))),
-      tap((players) => {
+      tap(x => (this.game = x)),
+      tap(x => (this.gameDestinationCount = getGameCount(x.type))),
+      map(value => value.players),
+      tap(x => (this.inDelay = this.needDelay(x))),
+      delayWhen(x => (this.needDelay(x) ? interval(2000) : interval(0))),
+      tap(players => {
         this.inDelay = false;
 
         this.currentPlayerIndex = this.findNextPlayerIndex(players);
@@ -72,13 +72,20 @@ export class GameComponent {
 
         this.currentRound = Math.floor(this.currentPlayer.throws.length / 3);
       }),
-      tap((players) => {
+      tap(players => {
         this.ranking = players
-          .sort((a: PlayerGameData, b: PlayerGameData) => getPlayerCount(b) - getPlayerCount(a))
-          .map((value) => value.playerRef.id);
+          .sort(
+            (a: PlayerGameData, b: PlayerGameData) =>
+              getPlayerCount(b) - getPlayerCount(a)
+          )
+          .map(value => value.playerRef.id);
       }),
       // provide a sorted array to show next player on top
-      map((value) => value.slice(this.currentPlayerIndex + 1, value.length).concat(value.slice(0, this.currentPlayerIndex)))
+      map(value =>
+        value
+          .slice(this.currentPlayerIndex + 1, value.length)
+          .concat(value.slice(0, this.currentPlayerIndex))
+      )
     );
 
     this.players.pipe().subscribe();
@@ -89,7 +96,9 @@ export class GameComponent {
     this.countTriple = false;
   }
 
-  public getPlayerByRef(playerRef: DocumentReference): Observable<PlayerData> | undefined {
+  public getPlayerByRef(
+    playerRef: DocumentReference
+  ): Observable<PlayerData> | undefined {
     if (playerRef) {
       return this.playerService.getPlayer(playerRef.id);
     } else {
@@ -106,7 +115,7 @@ export class GameComponent {
   }
 
   public getTrows(player: PlayerGameData): number {
-    return player.throws.filter((x) => x !== null).length;
+    return player.throws.filter(x => x !== null).length;
   }
 
   public hit(value: number): void {
@@ -114,7 +123,11 @@ export class GameComponent {
       return;
     }
 
-    const count: number = this.countTriple ? value * 3 : this.countDouble ? value * 2 : value;
+    const count: number = this.countTriple
+      ? value * 3
+      : this.countDouble
+      ? value * 2
+      : value;
 
     if (this.currentPlayerCount + count > this.gameDestinationCount) {
       this.snackBar.open('Punktzahl überschritten', '', {
@@ -131,7 +144,11 @@ export class GameComponent {
         this.currentPlayer.throws.push(null);
       }
     } else {
-      const countStr: number | string = this.countTriple ? `T${value}` : this.countDouble ? `D${value}` : value;
+      const countStr: number | string = this.countTriple
+        ? `T${value}`
+        : this.countDouble
+        ? `D${value}`
+        : value;
 
       this.currentPlayer.throws.push(countStr);
     }
@@ -142,7 +159,6 @@ export class GameComponent {
       .updateGame(this.gameId, this.game)
       .pipe(
         take(1),
-        tap(() => console.log('saved')),
         finalize(() => {
           if (this.currentPlayerCount === this.gameDestinationCount) {
             this.router.navigate(['result'], { relativeTo: this.route });
@@ -179,18 +195,24 @@ export class GameComponent {
   }
 
   public playerRank(player: PlayerGameData): number {
-    return this.ranking.findIndex((value) => value === player.playerRef.id) + 1;
+    return this.ranking.findIndex(value => value === player.playerRef.id) + 1;
   }
 
   private findNextPlayerIndex(source: Array<PlayerGameData>): number {
-    const playerIndex: number = source.findIndex((value) => value.throws.length % 3 !== 0);
+    const playerIndex: number = source.findIndex(
+      value => value.throws.length % 3 !== 0
+    );
     if (playerIndex >= 0) {
       return playerIndex;
     }
 
     let num: number;
 
-    for (const { player, index } of source.map((player, index) => ({ player, index }))) {
+    // tslint:disable-next-line:no-shadowed-variable
+    for (const { player, index } of source.map((player, index) => ({
+      player,
+      index
+    }))) {
       if (num && num > player.throws.length) {
         return index;
       } else {
@@ -206,7 +228,9 @@ export class GameComponent {
 
     return (
       this.currentPlayerIndex !== undefined &&
-      (nextPlayerIndex === this.currentPlayerIndex + 1 || (nextPlayerIndex === 0 && this.currentPlayerIndex === players.length - 1))
+      (nextPlayerIndex === this.currentPlayerIndex + 1 ||
+        (nextPlayerIndex === 0 &&
+          this.currentPlayerIndex === players.length - 1))
     );
   }
 }

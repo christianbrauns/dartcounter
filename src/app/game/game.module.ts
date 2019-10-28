@@ -13,6 +13,8 @@ import {
   MatSortModule,
   MatTableModule
 } from '@angular/material';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatChipsModule } from '@angular/material/chips';
 import { RouterModule } from '@angular/router';
 
 import { GameService } from '../services/game.service';
@@ -20,11 +22,14 @@ import { GameListComponent } from './game-list/game-list.component';
 import { GameComponent } from './game.component';
 import { NewGameComponent } from './new-game/new-game.component';
 import { ResultComponent } from './result/result.component';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
-  declarations: [NewGameComponent, GameComponent, GameListComponent, ResultComponent],
+  declarations: [
+    NewGameComponent,
+    GameComponent,
+    GameListComponent,
+    ResultComponent
+  ],
   imports: [
     CommonModule,
     RouterModule.forChild([

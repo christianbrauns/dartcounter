@@ -15,8 +15,8 @@ import { Subject } from 'rxjs';
 
 type Constructor<T> = new(...args: Array<any>) => T;
 
-export const WithDestroy: Function = <T1 extends Constructor<{}>>(Base: T1 = (class T2 {
-} as any)) => {
+// tslint:disable-next-line:ban-types
+export const WithDestroy: Function = <T1 extends Constructor<{}>>(Base: T1 = (class T2 {} as any)) => {
 
     return class extends Base implements OnDestroy {
         protected destroy$: Subject<void> = new Subject<void>();
