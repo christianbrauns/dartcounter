@@ -9,6 +9,7 @@ import { PlayerData } from '../player/player.component';
 import { CheckForUpdateService } from '../services/check-for-update.service';
 import { PlayerService } from '../services/player.service';
 import { PromptUpdateService } from '../services/prompt-update.service';
+import { SettingsService } from '../services/settings.service';
 
 @Component({
   selector: 'ad-root',
@@ -19,18 +20,14 @@ import { PromptUpdateService } from '../services/prompt-update.service';
 })
 export class RootComponent {
   public hasUpdate: Observable<boolean>;
-  public title: string = 'Aurora Dart';
   public user: Observable<User>;
 
   private dialogRef: MatDialogRef<LoginComponent>;
 
   constructor(
-    private readonly promptUpdateService: PromptUpdateService,
-    private readonly checkForUpdateService: CheckForUpdateService,
-    private readonly dialog: MatDialog,
-    private readonly afAuth: AngularFireAuth,
-    playerService: PlayerService
-  ) {
+    private readonly promptUpdateService: PromptUpdateService, private readonly checkForUpdateService: CheckForUpdateService,
+    private readonly dialog: MatDialog, private readonly afAuth: AngularFireAuth, playerService: PlayerService,
+    private readonly settings: SettingsService) {
     this.hasUpdate = promptUpdateService.hasUpdate;
     this.afAuth.authState.subscribe((value) => {
       if (value && this.dialogRef) {
@@ -45,6 +42,10 @@ export class RootComponent {
     });
 
     this.user = this.afAuth.user;
+  }
+
+  public get isUlfMode(): Observable<boolean> {
+    return this.settings.isUlfMode;
   }
 
   public doUpdate(): void {
@@ -62,4 +63,9 @@ export class RootComponent {
   public logout(): void {
     this.afAuth.auth.signOut();
   }
+
+  public toggleUlfMode(): void {
+    this.settings.toggleUlfMode();
+  }
+
 }

@@ -9,6 +9,7 @@ import { MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatSnac
 import { environment } from '../../environments/environment';
 import { LoginComponent } from '../login/login.component';
 import { PlayerService } from '../services/player.service';
+import { SettingsService } from '../services/settings.service';
 import { RootRoutingModule } from './root-routing.module';
 import { RootComponent } from './root.component';
 
@@ -26,9 +27,9 @@ import { RootComponent } from './root.component';
     MatButtonModule,
     MatDialogModule,
     MatSnackBarModule,
-    RootRoutingModule,
+    RootRoutingModule
   ],
-  providers: [PlayerService],
+  providers: [PlayerService, SettingsService]
 })
 export class RootModule {
 }

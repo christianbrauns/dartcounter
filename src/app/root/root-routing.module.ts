@@ -10,23 +10,27 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        loadChildren: () => import('../start/start.module').then(m => m.StartModule),
+        loadChildren: () => import('../start/start.module').then(m => m.StartModule)
       },
       {
         path: 'game',
-        loadChildren: () => import('../game/game.module').then(m => m.GameModule),
+        loadChildren: () => import('../game/game.module').then(m => m.GameModule)
       },
       {
         path: 'player',
-        loadChildren: () => import('../player/player.module').then(m => m.PlayerModule),
+        loadChildren: () => import('../player/player.module').then(m => m.PlayerModule)
       },
-    ],
-  },
+      {
+        path: 'credits',
+        loadChildren: () => import('../credits/credits.module').then(m => m.CreditsModule)
+      }
+    ]
+  }
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
+  exports: [RouterModule]
 })
 export class RootRoutingModule {
 }

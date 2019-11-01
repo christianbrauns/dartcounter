@@ -10,6 +10,7 @@ import { getGameCount } from '../gamerules';
 import { PlayerData } from '../player/player.component';
 import { GameService } from '../services/game.service';
 import { PlayerService } from '../services/player.service';
+import { SettingsService } from '../services/settings.service';
 import { getPlayerCount, typeColor } from '../utils/utils';
 
 export interface GameData {
@@ -48,7 +49,8 @@ export class GameComponent {
   // private ranking: Array<string> = new Array<string>();
 
   constructor(private readonly db: AngularFirestore, private readonly route: ActivatedRoute, private readonly snackBar: MatSnackBar,
-              private readonly router: Router, private readonly playerService: PlayerService, private readonly gameService: GameService) {
+              private readonly router: Router, private readonly playerService: PlayerService, private readonly gameService: GameService,
+              private readonly settings: SettingsService) {
     this.gameId = route.snapshot.paramMap.get('id');
 
     this.waitingPlayers = gameService.getChangesGameById(this.gameId).pipe(
@@ -79,6 +81,10 @@ export class GameComponent {
       map(value => value.slice(this.currentPlayerIndex + 1, value.length).concat(value.slice(0, this.currentPlayerIndex))
       )
     );
+  }
+
+  public get isUlfMode(): Observable<boolean> {
+    return this.settings.isUlfMode;
   }
 
   @HostListener('window:popstate', ['$event'])
@@ -170,6 +176,10 @@ export class GameComponent {
     return typeColor(color);
   }
 
+  // public playerRank(player: PlayerGameData): number {
+  //   return this.ranking.findIndex(value => value === player.playerRef.id) + 1;
+  // }
+
   public undo(): void {
     if (this.currentPlayer.throws.length % 3 === 0 && !this.inDelay) {
       if (this.currentPlayerIndex === 0) {
@@ -183,10 +193,6 @@ export class GameComponent {
 
     this.gameService.updateGame(this.gameId, this.game);
   }
-
-  // public playerRank(player: PlayerGameData): number {
-  //   return this.ranking.findIndex(value => value === player.playerRef.id) + 1;
-  // }
 
   private findNextPlayerIndex(source: Array<PlayerGameData>): number {
     const playerIndex: number = source.findIndex(

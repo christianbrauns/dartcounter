@@ -1,5 +1,6 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -16,6 +17,7 @@ import {
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatChipsModule } from '@angular/material/chips';
 import { RouterModule } from '@angular/router';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 import { GameService } from '../services/game.service';
 import { GameListComponent } from './game-list/game-list.component';
@@ -63,7 +65,9 @@ import { ResultComponent } from './result/result.component';
     MatCardModule,
     MatSortModule,
     MatChipsModule,
-    MatBadgeModule
+    MatBadgeModule,
+    HttpClientModule,
+    AngularSvgIconModule
   ],
   providers: [
     {
@@ -72,4 +76,5 @@ import { ResultComponent } from './result/result.component';
     }
   ]
 })
-export class GameModule {}
+export class GameModule {
+}

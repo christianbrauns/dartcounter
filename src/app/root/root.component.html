@@ -4,11 +4,15 @@
     <button mat-menu-item routerLink="/game/new">Spiel Starten</button>
     <button mat-menu-item routerLink="/player">Spieler</button>
     <button mat-menu-item routerLink="/game">Spiele</button>
+    <button (click)="toggleUlfMode()" mat-menu-item>Ulf Mode
+      <mat-icon *ngIf="isUlfMode | async">check</mat-icon>
+    </button>
     <button (click)="goToIssues()" mat-menu-item>Bug gefunden?</button>
     <button (click)="login()" *ngIf="!(user | async); else exit" mat-menu-item>Login</button>
     <ng-template #exit>
       <button (click)="logout()" mat-menu-item>Logout</button>
     </ng-template>
+    <button mat-menu-item routerLink="/credits">Credits</button>
   </mat-menu>
   <span class="spacer"></span>
   <button (click)="doUpdate()" *ngIf="hasUpdate | async" mat-icon-button>
@@ -16,7 +20,7 @@
   </button>
   <span class="mr-3">{{(user | async)?.displayName}}</span>
   <img *ngIf="(user | async)" [src]="(user | async)?.photoURL" alt="" class="rounded-circle align-self-center"
-       height="40" width="40" />
+       height="40" width="40"/>
   <button [matMenuTriggerFor]="appMenu" mat-icon-button>
     <mat-icon>more_vert</mat-icon>
   </button>

@@ -35,7 +35,8 @@
         <h4 *ngIf="currentPlayer" class="mb-1 mt-2">{{getPlayerAverage(currentPlayer) | number:'0.1-1'}}</h4>
       </div>
       <div *ngIf="currentPlayer" class="col">
-        <span class=""><mat-icon aria-hidden="false" aria-label="würfe">call_made</mat-icon>
+        <svg-icon [svgStyle]="{ 'width.px':'20', 'fill':'white' }" src="assets/img/darts.svg"></svg-icon>
+        <span>
           {{getTrows(currentPlayer)}}</span>
       </div>
       <div *ngIf="currentPlayer" class="col">
@@ -118,7 +119,7 @@
 </div>
 <div class="row mb-3">
   <div class="col text-center">
-    <button (click)="hit(0)" class="mat-button-wide" mat-raised-button>Ulf</button>
+    <button (click)="hit(0)" class="mat-button-wide" mat-raised-button>{{(isUlfMode | async) ? 'Ulf' : 'Daneben'}}</button>
   </div>
   <div class="col text-center">
     <button (click)="undo()" class="mat-button-wide" mat-raised-button>Undo</button>
