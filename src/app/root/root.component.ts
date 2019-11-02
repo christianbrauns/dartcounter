@@ -35,7 +35,7 @@ export class RootComponent {
         const player: PlayerData = {
           name: value.displayName ? value.displayName : value.email,
           photoURL: value.photoURL
-        } as PlayerData;
+        };
 
         playerService.setPlayer(value.uid, player);
       }

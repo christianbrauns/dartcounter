@@ -6,10 +6,10 @@ import { PlayerService } from '../services/player.service';
 import { NewPlayerDialogComponent } from './new-player-dialog/new-player-dialog.component';
 
 export interface PlayerData {
-  id: string;
+  id?: string;
   name: string;
   photoURL?: string;
-  team: string;
+  team?: string;
 }
 
 @Component({
